@@ -1,0 +1,47 @@
+name: Python CI
+
+on:
+    push:
+        branches: [main]
+    pull_request:
+        branches: [main]
+    workflow_dispatch:
+
+jobs:
+    lint:
+        runs-on: ubuntu-latest
+        container:
+            image: python:3.9
+        steps:
+            - uses: actions/checkout@v3
+            - name: Install dependencies
+              run: pip install -r requirements_test.txt
+            - name: Lint with flake8
+              run: flake8 .
+
+    unit_test:
+        runs-on: ubuntu-latest
+        container:
+            image: python:3.9
+        needs: lint
+        steps:
+            - uses: actions/checkout@v3
+            - name: Install dependencies
+              run: pip install -r requirements_test.txt
+            - name: Set PYTHONPATH
+              run: echo "PYTHONPATH=$PYTHONPATH:$(pwd)/ilovepdf-python" >> $GITHUB_ENV
+            - name: Run unit tests
+              run: pytest tests/unit
+    integration_test:
+        runs-on: ubuntu-latest
+        container:
+            image: python:3.9
+        needs: unit_test
+        steps:
+            - uses: actions/checkout@v3
+            - name: Install dependencies
+              run: pip install -r requirements_test.txt
+            - name: Set PYTHONPATH
+              run: echo "PYTHONPATH=$PYTHONPATH:$(pwd)/ilovepdf-python" >> $GITHUB_ENV
+            - name: Run integration tests
+              run: pytest tests/integration

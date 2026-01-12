@@ -1,0 +1,37 @@
+[
+    {
+        "label": "Git-Cola",
+        "command": "git-cola",
+        "args": [],
+        "use_new_terminal": false,
+        "shell": "system"
+    },
+    {
+        "label": "Run Black",
+        "command": "black",
+        "args": ["ilovepdf", "tests"],
+        "use_new_terminal": false,
+        "shell": "system"
+    },
+    {
+        "label": "Run Flake8",
+        "command": "flake8",
+        "args": ["ilovepdf", "tests"],
+        "use_new_terminal": false,
+        "shell": "system"
+    },
+    {
+        "label": "Run Test Unit",
+        "command": "pytest",
+        "args": ["tests/unit"],
+        "use_new_terminal": false,
+        "shell": "system"
+    },
+    {
+        "label": "Pre-commit",
+        "command": "pre-commit",
+        "args": ["run", "--all-files"],
+        "use_new_terminal": false,
+        "shell": "system"
+    }
+]
