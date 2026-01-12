@@ -5,379 +5,358 @@ This module provides the Ilovepdf class for managing API keys, tokens,
 file encryption, and sending requests to the iLovePDF API endpoints.
 """
 
-import hashlib
 import json
 import logging
 import os
 import pprint
-import secrets
 import time
+from dataclasses import dataclass
 from datetime import datetime, timezone
-from typing import Optional
+from typing import Any, Callable, Dict, Tuple
 
 import jwt
 import requests
+from dotenv import find_dotenv, load_dotenv
 from requests.exceptions import JSONDecodeError
 
-from ilovepdf.exceptions.auth_exception import AuthException
-from ilovepdf.exceptions.download_exception import DownloadException
-from ilovepdf.exceptions.process_exception import ProcessException
-from ilovepdf.exceptions.signature_exception import SignatureException
-from ilovepdf.exceptions.start_exception import StartException
-from ilovepdf.exceptions.task_exception import TaskException
-from ilovepdf.exceptions.upload_exception import UploadException
+from ilovepdf.exceptions import (
+    AuthException,
+    DownloadException,
+    ProcessException,
+    SignatureException,
+    StartException,
+    TaskException,
+    UploadException,
+)
 
-loglevel = os.environ.get("PYTHONLOGLEVEL", "INFO").upper()  # pylint: disable=no-member
+load_dotenv(find_dotenv())
 
-logging.basicConfig(level=loglevel)
-logging.getLogger("urllib3").setLevel(loglevel)
-logging.debug("DEBUG mode activated!")
-_logger = logging.getLogger(__name__)
-_logger.setLevel(loglevel)
+# Constants
+JWT_ALGORITHM = "HS256"
+TOKEN_EXPIRE_SECONDS = 3600
+TOKEN_CACHE_BUFFER_SECONDS = 120
+DEFAULT_TIME_DELAY_SECONDS = 5400
+DEFAULT_TIMEOUT_SECONDS = int(os.getenv("DEFAULT_TIMEOUT_SECONDS", "60"))
+API_VERSION = "v1"
+START_SERVER_URL = os.getenv("START_SERVER_URL", "https://api.ilovepdf.com")
+API_HOST = os.getenv("API_HOST", "api.ilovepdf.com")
+LIBRARY_VERSION = "python.0.0.1"
 
+# HTTP Status Codes
+HTTP_OK = 200
+HTTP_CREATED = 201
+HTTP_BAD_REQUEST = 400
+HTTP_UNAUTHORIZED = 401
+HTTP_FORBIDDEN = 403
+HTTP_TOO_MANY_REQUESTS = 429
+HTTP_INTERNAL_SERVER_ERROR = 500
 
-# Helper for random encryption key (to be implemented)
-def rand_sha256(length: int) -> str:
-    random_data = str(time.time()) + str(secrets.randbelow(80001) + 10000)
-    sha = hashlib.sha256(random_data.encode()).hexdigest()
-    return sha[:length]
+# Endpoints requiring large timeout
+LARGE_TIMEOUT_ENDPOINTS = ["process", "upload"]
 
-
-ALGORITHM = "HS256"
-EXPIRE_SEC = 3600
-
-
-class AuthManager:  # pylint: disable=too-few-public-methods
-    """Handles authentication and token management for iLovePDF API."""
-
-    def __init__(self, secret_key: str, public_key: str):
-        self.secret_key = secret_key
-        self.public_key = public_key
-        self.token_cache: Optional[tuple[str, int]] = None
-        self.token: Optional[str] = None
-
-
-class ServerConfig:  # pylint: disable=too-few-public-methods
-    """Stores server configuration and timeout settings for iLovePDF API."""
-
-    def __init__(self):
-        self.worker_server = None
-        self.time_delay = 5400
-        self.timeout = 10
-        self.timeout_large = None
+# pylint: disable=too-few-public-methods
 
 
-class EncryptionConfig:  # pylint: disable=too-few-public-methods
-    """Manages file encryption settings for iLovePDF API."""
+def _setup_logging(loglevel, logfile=None) -> logging.Logger:
+    """Configure and return logger for this module.
 
-    def __init__(self):
-        self.encrypted = False
-        self.encrypt_key = None
-
-
-class Ilovepdf:  # pylint: disable=too-many-public-methods
-    """Class for interacting with the iLovePDF API.
-
-    This class manages API keys, authentication tokens, file encryption,
-    and sending requests to iLovePDF API endpoints.
+    Returns:
+        logging.Logger: Configured logger instance.
     """
 
-    VERSION = "python.0.0.1"
-    _start_server = "https://api.ilovepdf.com"
-    _api_version = "v1"
+    params: dict[str, Any] = {
+        "level": loglevel,
+        "format": "%(asctime)s %(levelname)s %(name)s: %(message)s",
+    }
 
-    def __init__(self, public_key=None, secret_key=None):
-        if (
-            secret_key is None
-            or not isinstance(secret_key, str)
-            or secret_key.strip() == ""
-        ):
-            raise ValueError("A non-empty secret_key string is required for Ilovepdf.")
-        self.auth = AuthManager(secret_key, public_key)
-        self.server = ServerConfig()
-        self.encryption = EncryptionConfig()
-        self.info = None
+    if logfile:
+        params.update({"filemode": "a", "filename": logfile, "force": True})
 
-        if public_key and secret_key:
-            self.set_api_keys(public_key, secret_key)
+    logging.basicConfig(**params)
+    logging.getLogger("urllib3").setLevel(loglevel)
+    if loglevel == "DEBUG":
+        logging.debug("DEBUG mode activated!")
+    logger = logging.getLogger(__name__)
+    logger.setLevel(loglevel)
+    return logger
 
-    @property
-    def api_version(self):
-        return self._api_version
 
-    @classmethod
-    def set_api_version(cls, api_version):
-        cls._api_version = api_version
+env_loglevel = os.getenv("PYTHONLOGLEVEL", "INFO").upper()
+env_logfile = os.getenv("PYTHONLOGFILE")
+_logger = _setup_logging(env_loglevel, env_logfile)
 
-    def set_api_keys(self, public_key, secret_key):
-        self.auth.public_key = public_key
-        self.auth.secret_key = secret_key
 
-    def get_secret_key(self):
-        return self.auth.secret_key or ""
+@dataclass
+class AuthManager:
+    """Handles authentication and token management for iLovePDF API.
 
-    def get_public_key(self):
-        return self.auth.public_key or ""
+    Attributes:
+        secret_key (str): API secret key for authentication.
+        public_key (str): API public key for authentication.
+        token_cache (Optional[Tuple[str, int]]): Cached token and expiration.
+        token (Optional[str]): Current JWT token.
+    """
 
-    def get_token(self) -> str:
-        # Ensure secret_key is a non-empty string before proceeding
-        if (
-            self.auth.secret_key is None
-            or not isinstance(self.auth.secret_key, str)
-            or self.auth.secret_key.strip() == ""
-        ):
-            raise ValueError(
-                "A non-empty secret_key string is required to generate a token."
-            )
-        # Use cached token if not expiring soon
-        if self.auth.token_cache is not None:
-            token, exp = self.auth.token_cache
-            if exp - 120 > int(datetime.now(timezone.utc).timestamp()):
-                self.auth.token = token
-                return token
+    secret_key: str
+    public_key: str
+    token_cache: Tuple[str, int] | None = None
+    token: str | None = None
 
-        # Try to get token from API (for test compatibility)
-        try:
-            url = f"{self.get_start_server()}/v1/auth"
-            headers = {"Accept": "application/json"}
-            data = {"public_key": self.get_public_key()}
-            response = requests.request(
-                "POST",
-                url,
-                json=data,
-                headers=headers,
-                timeout=self.server.timeout,
-            )
-            if response.status_code in (200, 201):
-                response_json = response.json()
-                token = response_json.get("token")
-                if token:
-                    now = int(datetime.now(timezone.utc).timestamp())
-                    exp = now + EXPIRE_SEC
-                    self.auth.token_cache = (token, exp)
-                    self.auth.token = token
-                    return token
-                raise KeyError("Token not found in response")
 
-            if response.status_code == 401:
-                response_json = response.json()
-                raise AuthException(
-                    response_json.get("error", {}).get("type", "Auth error"),
-                    response_json,
-                    response.status_code,
-                )
+@dataclass
+class ServerConfig:
+    """Stores server configuration and timeout settings for iLovePDF API.
 
-            response_json = {}
-            try:
-                response_json = response.json()
-            except JSONDecodeError as exc:
-                logging.warning("Error parsing response JSON: %s", exc)
-                response_json = None
-            # Raise AuthException for all relevant HTTP error codes
-            if response.status_code in (400, 401, 403, 500):
-                raise AuthException(
-                    response_json.get("error", {}).get("type", "Auth error"),
-                    response_json,
-                    response.status_code,
-                )
-            raise Exception(
-                response_json.get("error", {}).get("message", "Auth failed")
-            )
-        except requests.RequestException:
-            # Fallback to local JWT if HTTP request fails (for offline/dev mode)
-            pass
+    Attributes:
+        worker_server (Optional[str]): Worker server URL for task processing.
+        time_delay (int): Time delay in seconds. Default is 5400.
+        timeout (int): Request timeout in seconds. Default is 10.
+        timeout_large (Optional[int]): Timeout for large operations.
+    """
 
-        # Fallback: generate local JWT
-        now = int(datetime.now(timezone.utc).timestamp())
-        exp = now + EXPIRE_SEC
-        payload = {
-            "iss": "api.ilovepdf.com",
-            "aud": "",
-            "iat": now,
-            "nbf": now,
-            "exp": exp,
-            "jti": self.auth.public_key,
-        }
-        token = jwt.encode(payload, self.auth.secret_key, algorithm=ALGORITHM)
-        self.auth.token_cache = (token, exp)
-        self.auth.token = token
-        return token
+    worker_server: str | None = None
+    time_delay: int = DEFAULT_TIME_DELAY_SECONDS
+    timeout: int = DEFAULT_TIMEOUT_SECONDS
+    timeout_large: int | None = None
 
-    def get_jwt(self):
-        if self.auth.token:
-            return self.auth.token
-        secret = self.get_secret_key()
-        current_time = int(time.time())
-        host_info = ""
-        token = {
-            "iss": host_info,
-            "aud": host_info,
-            "iat": current_time - self.server.time_delay,
-            "nbf": current_time - self.server.time_delay,
-            "exp": current_time + 3600 + self.server.time_delay,
-            "jti": self.get_public_key(),
-        }
-        if self.is_file_encryption():
-            token["file_encryption_key"] = self.get_encrypt_key()
-        self.auth.token = jwt.encode(
-            token, secret, algorithm=self.get_token_algorithm()
+
+@dataclass
+class EncryptionConfig:
+    """Manages file encryption settings for iLovePDF API.
+
+    Attributes:
+        encrypted (bool): Whether file encryption is enabled.
+        encrypt_key (Optional[str]): Encryption key for file operations.
+    """
+
+    encrypted: bool = False
+    encrypt_key: str | None = None
+
+
+class RequestBuilder:
+    """Builds and prepares HTTP requests for the iLovePDF API.
+
+    This class encapsulates the logic for constructing URLs, headers,
+    timeouts, and parameters for API requests.
+    """
+
+    def __init__(
+        self,
+        server_config: ServerConfig,
+        auth_manager: AuthManager,
+        get_token_callback: Callable[[], str],
+        start_server: str,
+    ) -> None:
+        """Initialize RequestBuilder.
+
+        Args:
+            server_config (ServerConfig): Server configuration.
+            auth_manager (AuthManager): Authentication manager.
+            get_token_callback (Callable): Callback to get authentication
+                token.
+            start_server (str): Start server URL.
+        """
+        self.server_config = server_config
+        self.auth_manager = auth_manager
+        self.get_token = get_token_callback
+        self.start_server = start_server
+
+    def build_url(self, endpoint: str, start: bool) -> str:
+        """Build the full URL for the API request.
+
+        Args:
+            endpoint (str): API endpoint path.
+            start (bool): Whether to use start server or worker server.
+
+        Returns:
+            str: Complete URL for the request.
+        """
+        server = self.start_server
+        if not start and self.server_config.worker_server is not None:
+            server = self.server_config.worker_server
+        return f"{server}/{API_VERSION}/{endpoint}"
+
+    def build_timeout(self, endpoint: str) -> int:
+        """Determine the appropriate timeout for the request.
+
+        Args:
+            endpoint (str): API endpoint path.
+
+        Returns:
+            int: Timeout in seconds.
+        """
+        is_large_endpoint = endpoint in LARGE_TIMEOUT_ENDPOINTS or (
+            endpoint.startswith("download/")
         )
-        return self.auth.token
+
+        if is_large_endpoint and self.server_config.timeout_large:
+            return self.server_config.timeout_large
+        return self.server_config.timeout
+
+    def build_headers(self, endpoint: str) -> Dict[str, str]:
+        """Build headers for the API request.
+
+        Args:
+            endpoint (str): API endpoint path.
+
+        Returns:
+            Dict[str, str]: Request headers.
+        """
+        if endpoint == "auth":
+            return {}
+
+        return {
+            "Authorization": f"Bearer {self.get_token()}",
+            "Accept": "application/json",
+        }
+
+    def prepare_params(
+        self,
+        params: Dict[str, Any] | None,
+        headers: Dict[str, str],
+        endpoint: str,
+    ) -> Dict[str, Any]:
+        """Prepare and normalize request parameters.
+
+        Args:
+            params (Optional[Dict[str, Any]]): Original parameters.
+            headers (Dict[str, str]): Request headers.
+            endpoint (str): API endpoint path.
+
+        Returns:
+            Dict[str, Any]: Prepared request parameters.
+        """
+        params = dict(params or {})
+        params.setdefault("headers", headers)
+
+        # Only add data dict if not a start endpoint (GET requests don't need empty data)
+        if not endpoint.startswith("start/"):
+            params.setdefault("data", {})
+
+        # Special handling for process endpoint
+        if endpoint == "process":
+            if "Accept" in params["headers"]:
+                del params["headers"]["Accept"]
+            if "files" in params["data"]:
+                params["headers"]["Content-Type"] = "application/json"
+                params["data"] = json.dumps(params["data"])
+        if endpoint == "signature":
+            params["headers"]["Accept"] = "application/json"
+            if "data" in params:
+                params["json"] = params["data"]
+                del params["data"]
+        return params
+
+
+class ResponseHandler:
+    """Handles parsing and validation of API responses.
+
+    This class encapsulates the logic for processing API responses,
+    including JSON parsing and error detection.
+    """
 
     @staticmethod
-    def get_token_algorithm():
-        return "HS256"
+    def parse_json(response: requests.Response) -> Dict[str, Any]:
+        """Parse JSON from response body.
 
-    @classmethod
-    def set_start_server(cls, server):
-        cls._start_server = server
+        Args:
+            response (requests.Response): The HTTP response.
 
-    @classmethod
-    def get_start_server(cls):
-        return cls._start_server
-
-    def get_worker_server(self):
-        return self.server.worker_server
-
-    def set_worker_server(self, worker_server):
-        self.server.worker_server = worker_server
-
-    def set_file_encryption(self, encrypt_key=None):
+        Returns:
+            Dict[str, Any]: Parsed JSON or error dict if parsing fails.
         """
-        Enables file encryption. If a key is provided, it will be used.
-        If not, a random key will be generated.
-        """
-        self.enable_encryption(True)
-        if encrypt_key is None:
-            encrypt_key = rand_sha256(32)
-        if len(encrypt_key) not in (16, 24, 32):
-            raise ValueError("Encrypt key should have 16, 24 or 32 chars length")
-        self.encryption.encrypt_key = encrypt_key
-        return self
-
-    def disable_file_encryption(self):
-        """
-        Disables file encryption and removes the encryption key.
-        """
-        self.enable_encryption(False)
-        self.encryption.encrypt_key = None
-        return self
-
-    def enable_encryption(self, enable):
-        self.encryption.encrypted = enable
-
-    def set_encryption(self, enable):
-        self.enable_encryption(enable)
-
-    def is_file_encryption(self):
-        return self.encryption.encrypted
-
-    def get_encrypt_key(self):
-        return self.encryption.encrypt_key
-
-    def set_encrypt_key(self, encrypt_key=None):
-        if encrypt_key is None:
-            encrypt_key = rand_sha256(32)
-        if len(encrypt_key) not in (16, 24, 32):
-            raise ValueError("Encrypt key should have 16, 24 or 32 chars length")
-        self.encryption.encrypt_key = encrypt_key
-
-    def send_request(
-        self, method, endpoint, params=None, start=False
-    ):  # pylint: disable=too-many-locals,too-many-branches
-        to_server = self.get_start_server()
-        if not start and self.get_worker_server() is not None:
-            to_server = self.get_worker_server()
-
-        timeout = (
-            self.server.timeout_large
-            if endpoint in ["process", "upload"] or endpoint.startswith("download/")
-            else self.server.timeout
-        )
-        headers = (
-            {
-                "Authorization": f"Bearer {self.get_token()}",
-                "Accept": "application/json",
-            }
-            if endpoint != "auth"
-            else {}
-        )
-
-        url = f"{to_server}/v1/{endpoint}"
-        request_params = params.copy() if params else {}
-        request_params.setdefault("headers", headers)
-        request_params.setdefault("timeout", timeout)
-
-        if endpoint == "process":
-            del request_params["headers"]["Accept"]
-            if "files" in request_params["data"]:
-                request_params["headers"].update({"Content-Type": "application/json"})
-                request_params["data"] = json.dumps(request_params["data"])
-            # request_params["data"] = json.dumps(request_params["data"])
-
-            # if "files" in request_params["data"]:
-            #     request_params["headers"].update({"Content-Type": "application/json"})
-            #     print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>", type(request_params["data"]))
-            #     print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>", request_params["data"])
-            #     request_params["data"]["files"] = [
-            #         item.get_file_options()
-            #         for item in request_params["data"]["files"]
-            #     ]
-
-        _logger.debug(
-            "\nREQUEST:\n  method: %s\n  url: %s\n  params:\n%s",
-            method.upper(),
-            url,
-            pprint.pformat(request_params, indent=4),
-        )
-
         try:
-            response = requests.request(method.upper(), url, **request_params)
-        except requests.ConnectionError as exc:
-            # Propagate ConnectionError so tests can catch it
-            raise ConnectionError(f"Connection error: {exc}") from exc
-        except requests.RequestException as exc:
-            raise Exception(f"HTTP request failed: {exc}") from exc
-
-        response_code = response.status_code
-        try:
-            response_body = response.json()
-            _logger.debug("RESPONSE: status=%s, body=%s", response_code, response_body)
+            return response.json()
         except JSONDecodeError:
-            response_body = {}
-
-        if response_code not in (200, 201):
-            if response_code == 401:
-                raise AuthException(
-                    response_body.get("name", "Auth error"),
-                    response_body,
-                    response_code,
-                )
-            # Diccionario de handlers exactos
-            endpoint_handlers = {
-                "upload": self._handle_upload_response,
-                "process": self._handle_process_response,
+            return {
+                "error": "Failed to parse JSON response",
+                "raw_response": response.text or "Empty response",
             }
-            handler = endpoint_handlers.get(endpoint)
-            if handler:
-                handler(response_body, response_code)
-            # Diccionario de handlers por prefijo
-            prefix_handlers = {
-                "download": self._handle_download_response,
-                "start": self._handle_start_response,
-            }
-            for prefix, func in prefix_handlers.items():
-                if endpoint.startswith(prefix):
-                    func(response_body, response_code)
-                    break
-            if response_code == 429:
-                raise Exception("Too Many Requests")
-            if response_code == 400:
-                self._handle_bad_request(endpoint, response_body, response_code)
-            self._handle_generic_error(response_body, response_code)
-        return response
 
-    def _handle_upload_response(self, response_body, response_code):
+    @staticmethod
+    def is_success(response: requests.Response) -> bool:
+        """Check if response indicates success.
+
+        Args:
+            response (requests.Response): The HTTP response.
+
+        Returns:
+            bool: True if status code indicates success.
+        """
+        return response.status_code in (HTTP_OK, HTTP_CREATED)
+
+
+class ErrorRouter:
+    """Routes errors to appropriate exception handlers.
+
+    This class encapsulates error handling logic, routing different
+    error types to their respective handlers based on endpoint and
+    status code.
+    """
+
+    def __init__(self) -> None:
+        """Initialize ErrorRouter."""
+        self.endpoint_handlers: Dict[str, Callable[[Any, int], None]] = {
+            "upload": self._handle_upload_response,
+            "process": self._handle_process_response,
+        }
+
+    def route(
+        self, endpoint: str, response_body: Dict[str, Any], response_code: int
+    ) -> None:
+        """Route error handling based on endpoint and status code.
+
+        Args:
+            endpoint (str): API endpoint path.
+            response_body (Dict[str, Any]): Response body.
+            response_code (int): HTTP status code.
+
+        Raises:
+            UploadException: For upload errors.
+            ProcessException: For process errors.
+            DownloadException: For download errors.
+            StartException: For start errors.
+            TaskException: For task-related errors.
+            SignatureException: For signature-related errors.
+        """
+        # Exact endpoint handlers
+        if endpoint in self.endpoint_handlers:
+            self.endpoint_handlers[endpoint](response_body, response_code)
+            return
+
+        # Prefix-based handlers
+        if endpoint.startswith("download"):
+            self._handle_download_response(response_body, response_code)
+            return
+
+        if endpoint.startswith("start"):
+            self._handle_start_response(response_body, response_code)
+            return
+
+        # Status code handlers
+        if response_code == HTTP_TOO_MANY_REQUESTS:
+            raise ProcessException("Too Many Requests")
+
+        if response_code == HTTP_BAD_REQUEST:
+            self._handle_bad_request(endpoint, response_body, response_code)
+            return
+
+        # Generic error handler
+        self._handle_generic_error(response_body, response_code)
+
+    @staticmethod
+    def _handle_upload_response(
+        response_body: Dict[str, Any] | str, response_code: int
+    ) -> None:
+        """Handle upload error responses.
+
+        Args:
+            response_body (Union[Dict[str, Any], str]): Response body.
+            response_code (int): HTTP status code.
+
+        Raises:
+            UploadException: Always raises with error details.
+        """
         if isinstance(response_body, str):
             raise UploadException("Upload error", response_body, response_code)
         raise UploadException(
@@ -386,21 +365,57 @@ class Ilovepdf:  # pylint: disable=too-many-public-methods
             response_code,
         )
 
-    def _handle_process_response(self, response_body, response_code):
+    @staticmethod
+    def _handle_process_response(
+        response_body: Dict[str, Any], response_code: int
+    ) -> None:
+        """Handle process error responses.
+
+        Args:
+            response_body (Dict[str, Any]): Response body.
+            response_code (int): HTTP status code.
+
+        Raises:
+            ProcessException: Always raises with error details.
+        """
         raise ProcessException(
             response_body.get("error", {}).get("message", "Process error"),
             response_body,
             response_code,
         )
 
-    def _handle_download_response(self, response_body, response_code):
+    @staticmethod
+    def _handle_download_response(
+        response_body: Dict[str, Any], response_code: int
+    ) -> None:
+        """Handle download error responses.
+
+        Args:
+            response_body (Dict[str, Any]): Response body.
+            response_code (int): HTTP status code.
+
+        Raises:
+            DownloadException: Always raises with error details.
+        """
         raise DownloadException(
             response_body.get("error", {}).get("message", "Download error"),
             response_body,
             response_code,
         )
 
-    def _handle_start_response(self, response_body, response_code):
+    @staticmethod
+    def _handle_start_response(
+        response_body: Dict[str, Any], response_code: int
+    ) -> None:
+        """Handle start error responses.
+
+        Args:
+            response_body (Dict[str, Any]): Response body.
+            response_code (int): HTTP status code.
+
+        Raises:
+            StartException: Always raises with error details.
+        """
         error = response_body.get("error", {})
         if error.get("type"):
             raise StartException(
@@ -408,11 +423,33 @@ class Ilovepdf:  # pylint: disable=too-many-public-methods
                 response_body,
                 response_code,
             )
-        raise Exception("Bad Request")
+        raise StartException("Bad Request", response_body, response_code)
 
-    def _handle_bad_request(self, endpoint, response_body, response_code):
+    @staticmethod
+    def _handle_bad_request(
+        endpoint: str, response_body: Dict[str, Any], response_code: int
+    ) -> None:
+        """Handle bad request (400) error responses.
+
+        Args:
+            endpoint (str): API endpoint path.
+            response_body (Dict[str, Any]): Response body.
+            response_code (int): HTTP status code.
+
+        Raises:
+            TaskException: For task-related errors.
+            SignatureException: For signature-related errors.
+            ProcessException: For other bad request errors.
+        """
+
+        _logger.debug(
+            "\nBad request error:\n%s",
+            pprint.pformat(response_body, indent=4),
+        )
+
         if "task" in endpoint:
-            raise TaskException("Invalid task id")
+            raise TaskException("Invalid task id", response_body, response_code)
+
         if "signature" in endpoint:
             error = response_body.get("error", {})
             raise SignatureException(
@@ -420,42 +457,535 @@ class Ilovepdf:  # pylint: disable=too-many-public-methods
                 response_body,
                 response_code,
             )
+
         error = response_body.get("error", {})
         if error.get("type"):
-            raise Exception(error.get("message", "Bad Request"))
-        raise Exception("Bad Request")
+            raise ProcessException(error.get("message", "Bad Request"))
+        raise ProcessException("Bad Request")
 
-    def _handle_generic_error(self, response_body, response_code):
+    @staticmethod
+    def _handle_generic_error(
+        response_body: Dict[str, Any], response_code: int
+    ) -> None:
+        """Handle generic error responses.
+
+        Args:
+            response_body (Dict[str, Any]): Response body.
+            response_code (int): HTTP status code.
+
+        Raises:
+            ProcessException: Always raises with error details.
+        """
         error = response_body.get("error", {})
         if error.get("message"):
-            raise Exception(f"HTTP {response_code}: {error.get('message')}")
-        raise Exception(f"HTTP {response_code}: Bad Request")
+            msg = f"HTTP {response_code}: {error.get('message')}"
+            raise ProcessException(msg, response_body, response_code)
+        raise ProcessException(
+            f"HTTP {response_code}: Bad Request", response_body, response_code
+        )
 
-    def get_status(self, server, task_id):
-        worker_server = self.get_worker_server()
+
+class Ilovepdf:  # pylint: disable=too-many-public-methods
+    """
+    Class for interacting with the iLovePDF API.
+
+    This class manages API keys, authentication tokens, file encryption,
+    and sending requests to iLovePDF API endpoints.
+
+    Args:
+        public_key (str, optional): API public key. If not provided,
+            uses ILOVEPDF_PUBLIC_KEY env variable.
+        secret_key (str, optional): API secret key. If not provided,
+            uses ILOVEPDF_SECRET_KEY env variable.
+
+    Raises:
+        ValueError: If public_key or secret_key are empty or invalid.
+
+    Example:
+        ilovepdf = Ilovepdf(
+            public_key="your_public_key",
+            secret_key="your_secret_key"
+        )
+    """
+
+    VERSION = LIBRARY_VERSION
+    _start_server = START_SERVER_URL
+    _api_version = API_VERSION
+
+    def __init__(
+        self, public_key: str | None = None, secret_key: str | None = None
+    ) -> None:
+        super().__init__()
+        if public_key is None:
+            public_key = os.getenv("ILOVEPDF_PUBLIC_KEY")
+        if secret_key is None:
+            secret_key = os.getenv("ILOVEPDF_SECRET_KEY")
+
+        self._validate_api_key(public_key, "public_key")
+        self._validate_api_key(secret_key, "secret_key")
+
+        # Type checker: validated keys are guaranteed to be str at this point
+        self.auth = AuthManager(
+            secret_key=secret_key,  # type: ignore
+            public_key=public_key,  # type: ignore
+        )
+        self.server = ServerConfig()
+        self.encryption = EncryptionConfig()
+        self.info = None
+
+        # Initialize request and error handling components
+        self._request_builder = RequestBuilder(
+            self.server, self.auth, self.get_token, self.get_start_server()
+        )
+        self._response_handler = ResponseHandler()
+        self._error_router = ErrorRouter()
+
+    @staticmethod
+    def _validate_api_key(key: str | None, key_name: str) -> None:
+        """Validate that an API key is a non-empty string.
+
+        Args:
+            key (Optional[str]): The API key to validate.
+            key_name (str): Name of the key for error messages.
+
+        Raises:
+            ValueError: If the key is None, not a string, or empty.
+        """
+        if not key or not isinstance(key, str) or key.strip() == "":
+            raise ValueError(
+                f"A non-empty {key_name} string is required for IlovePDF "
+                f"(argument or ILOVEPDF_{key_name.upper()} env variable)."
+            )
+
+    @property
+    def api_version(self) -> str:
+        """Get the API version.
+
+        Returns:
+            str: The current API version. Default is "v1".
+        """
+        return self._api_version
+
+    @classmethod
+    def set_api_version(cls, api_version: str) -> None:
+        """Set the API version.
+
+        Args:
+            api_version (str): The API version to use.
+        """
+        cls._api_version = api_version
+
+    def set_api_keys(self, public_key: str, secret_key: str) -> None:
+        """Set the API keys.
+
+        Args:
+            public_key (str): The API public key.
+            secret_key (str): The API secret key.
+        """
+        self.auth.public_key = public_key
+        self.auth.secret_key = secret_key
+
+    def get_secret_key(self) -> str:
+        """Get the secret key.
+
+        Returns:
+            str: The API secret key. Default is empty string.
+        """
+        return self.auth.secret_key or ""
+
+    def get_public_key(self) -> str:
+        """Get the public key.
+
+        Returns:
+            str: The API public key. Default is empty string.
+        """
+        return self.auth.public_key or ""
+
+    def get_token(self) -> str:
+        """Get the JWT token for API authentication.
+
+        Retrieves a cached token if still valid, otherwise requests a new
+        token from the API. Falls back to local JWT generation if API fails.
+
+        Returns:
+            str: Valid JWT authentication token.
+
+        Raises:
+            ValueError: If secret_key is not a non-empty string.
+            AuthException: If authentication with the API fails.
+        """
+        self._validate_api_key(self.auth.secret_key, "secret_key")
+
+        # Check cached token
+        if self._is_token_cache_valid():
+            # Type checker: cache is guaranteed to be non-None here
+            token, _ = self.auth.token_cache  # type: ignore
+            self.auth.token = token
+            return token
+
+        # Try to get token from API
+        try:
+            token = self._request_token_from_api()
+            self._cache_token(token)
+            return token
+        except requests.RequestException as exc:
+            _logger.warning(
+                "Failed to get token from API (%s), "
+                "falling back to local JWT generation.",
+                exc,
+            )
+
+        # Fallback: generate local JWT
+        token = self._generate_local_jwt()
+        self._cache_token(token)
+        return token
+
+    def _is_token_cache_valid(self) -> bool:
+        """Check if the cached token is still valid.
+
+        Returns:
+            bool: True if cached token exists and hasn't expired.
+        """
+        if self.auth.token_cache is None:
+            return False
+        _, exp = self.auth.token_cache
+        current_time = int(datetime.now(timezone.utc).timestamp())
+        return exp - TOKEN_CACHE_BUFFER_SECONDS > current_time
+
+    def _request_token_from_api(self) -> str:
+        """Request a new token from the iLovePDF API.
+
+        Returns:
+            str: JWT token from the API.
+
+        Raises:
+            AuthException: If authentication fails or response is invalid.
+        """
+        url = f"{self.get_start_server()}/{API_VERSION}/auth"
+        headers = {"Accept": "application/json"}
+        data = {"public_key": self.get_public_key()}
+
+        response = requests.request(
+            "POST",
+            url,
+            json=data,
+            headers=headers,
+            timeout=self.server.timeout,
+        )
+
+        if response.status_code in (HTTP_OK, HTTP_CREATED):
+            response_json = response.json()
+            token = response_json.get("token")
+            if token:
+                return token
+            raise KeyError("Token not found in response")
+
+        # Handle error responses
+        response_json = self._response_handler.parse_json(response)
+
+        if response.status_code == HTTP_UNAUTHORIZED:
+            raise AuthException(
+                response_json.get("error", {}).get("type", "Auth error"),
+                response_json,
+                response.status_code,
+            )
+
+        if response.status_code in (
+            HTTP_BAD_REQUEST,
+            HTTP_FORBIDDEN,
+            HTTP_INTERNAL_SERVER_ERROR,
+        ):
+            raise AuthException(
+                response_json.get("error", {}).get("type", "Auth error"),
+                response_json,
+                response.status_code,
+            )
+
+        raise AuthException(
+            response_json.get("error", {}).get("message", "Auth failed")
+        )
+
+    def _generate_local_jwt(self) -> str:
+        """Generate a JWT token locally.
+
+        Returns:
+            str: Locally generated JWT token.
+        """
+        now = int(datetime.now(timezone.utc).timestamp())
+        exp = now + TOKEN_EXPIRE_SECONDS
+
+        payload = {
+            "iss": API_HOST,
+            "aud": API_HOST,
+            "iat": now,
+            "nbf": now,
+            "exp": exp,
+            "jti": self.auth.public_key,
+        }
+
+        if self.is_file_encryption():
+            payload["file_encryption_key"] = self.get_encrypt_key()  # type: ignore
+
+        token = jwt.encode(payload, self.auth.secret_key, algorithm=JWT_ALGORITHM)
+        return token
+
+    def _cache_token(self, token: str) -> None:
+        """Cache a token with its expiration time.
+
+        Args:
+            token (str): The JWT token to cache.
+        """
+        now = int(datetime.now(timezone.utc).timestamp())
+        exp = now + TOKEN_EXPIRE_SECONDS
+        self.auth.token_cache = (token, exp)
+        self.auth.token = token
+
+    def get_jwt(self) -> str:
+        """Get the JWT token.
+
+        Returns:
+            str: JWT authentication token.
+        """
+        if self.auth.token:
+            return self.auth.token
+
+        current_time = int(time.time())
+        token_dict: Dict[str, int | str | None] = {
+            "iss": API_HOST,
+            "aud": API_HOST,
+            "iat": current_time - self.server.time_delay,
+            "nbf": current_time - self.server.time_delay,
+            "exp": current_time + TOKEN_EXPIRE_SECONDS + self.server.time_delay,
+            "jti": self.get_public_key(),
+        }
+
+        if self.is_file_encryption():
+            token_dict["file_encryption_key"] = self.get_encrypt_key()
+
+        self.auth.token = jwt.encode(
+            token_dict,
+            self.get_secret_key(),
+            algorithm=self.get_token_algorithm(),
+        )
+        return self.auth.token
+
+    @staticmethod
+    def get_token_algorithm() -> str:
+        """Get the JWT token algorithm.
+
+        Returns:
+            str: The algorithm used for JWT encoding. Default is "HS256".
+        """
+        return JWT_ALGORITHM
+
+    @classmethod
+    def set_start_server(cls, server: str) -> None:
+        """Set the start server URL.
+
+        Args:
+            server (str): The base URL for the API server.
+        """
+        cls._start_server = server
+
+    @classmethod
+    def get_start_server(cls) -> str:
+        """Get the start server URL.
+
+        Returns:
+            str: The base URL for the API server.
+        """
+        return cls._start_server
+
+    def get_worker_server(self) -> str | None:
+        """Get the worker server URL.
+
+        Returns:
+            Optional[str]: Worker server URL if set, otherwise None.
+        """
+        return self.server.worker_server
+
+    def set_worker_server(self, worker_server: str | None) -> None:
+        """Set the worker server URL.
+
+        Args:
+            worker_server (Optional[str]): The worker server URL for task
+                processing, or None to clear it.
+        """
+        self.server.worker_server = worker_server
+
+    def is_file_encryption(self) -> bool:
+        """Check if file encryption is enabled.
+
+        Returns:
+            bool: True if file encryption is enabled, False otherwise.
+        """
+        return self.encryption.encrypted
+
+    def get_encrypt_key(self) -> str | None:
+        """Get the encryption key.
+
+        Returns:
+            Optional[str]: The encryption key if set, otherwise None.
+        """
+        return self.encryption.encrypt_key
+
+    def send_request(
+        self,
+        method: str,
+        endpoint: str,
+        params: Dict[str, Any] | None = None,
+        start: bool = False,
+    ) -> requests.Response:
+        """Send a request to the iLovePDF API.
+
+        Args:
+            method (str): HTTP method (GET, POST, etc.).
+            endpoint (str): API endpoint path.
+            params (Optional[Dict[str, Any]]): Request parameters.
+            start (bool): Whether this is a start server request.
+
+        Returns:
+            requests.Response: The HTTP response object.
+
+        Raises:
+            ConnectionError: If connection to server fails.
+            AuthException: If authentication fails (401).
+            UploadException: If upload operation fails.
+            ProcessException: If processing operation fails.
+            DownloadException: If download operation fails.
+            StartException: If start operation fails.
+        """
+        # Update request builder with current start server
+        self._request_builder.start_server = self.get_start_server()
+
+        url = self._request_builder.build_url(endpoint, start)
+        timeout = self._request_builder.build_timeout(endpoint)
+        headers = self._request_builder.build_headers(endpoint)
+        params = self._request_builder.prepare_params(params, headers, endpoint)
+
+        _logger.debug(
+            "\nREQUEST:\n  method: %s\n  url: %s\n  params:\n%s",
+            method.upper(),
+            url,
+            pprint.pformat(params, indent=4),
+        )
+
+        response = self._execute_request(method, url, timeout, params)
+        return self._handle_response(response, endpoint)
+
+    def _execute_request(
+        self, method: str, url: str, timeout: int, params: Dict[str, Any]
+    ) -> requests.Response:
+        """Execute the HTTP request.
+
+        Args:
+            method (str): HTTP method.
+            url (str): Complete URL.
+            timeout (int): Request timeout.
+            params (Dict[str, Any]): Request parameters.
+
+        Returns:
+            requests.Response: The HTTP response.
+
+        Raises:
+            ConnectionError: If connection fails.
+            ProcessException: If request fails for other reasons.
+        """
+        try:
+            return requests.request(method.upper(), url, timeout=timeout, **params)
+        except requests.ConnectionError as exc:
+            raise ConnectionError(f"Connection error: {exc}") from exc
+        except requests.RequestException as exc:
+            raise ProcessException(f"HTTP request failed: {exc}") from exc
+
+    def _handle_response(
+        self, response: requests.Response, endpoint: str
+    ) -> requests.Response:
+        """Handle and validate the API response.
+
+        Args:
+            response (requests.Response): The HTTP response.
+            endpoint (str): API endpoint path.
+
+        Returns:
+            requests.Response: The validated response.
+
+        Raises:
+            AuthException: If authentication fails.
+            UploadException: If upload fails.
+            ProcessException: If processing fails.
+            DownloadException: If download fails.
+            StartException: If start operation fails.
+        """
+        response_code: int = response.status_code
+
+        _logger.debug(
+            "RESPONSE: status=%s, content_type=%s",
+            response_code,
+            response.headers.get("Content-Type", "unknown"),
+        )
+
+        if self._response_handler.is_success(response):
+            return response
+
+        # Only parse JSON for error responses
+        response_body = self._response_handler.parse_json(response)
+
+        # Handle error responses
+        if response_code == HTTP_UNAUTHORIZED:
+            raise AuthException(
+                response_body.get("name", "Auth error"),
+                response_body,
+                response_code,
+            )
+
+        # Route to specific error handlers
+        self._error_router.route(endpoint, response_body, response_code)
+
+        return response
+
+    def get_status(self, server: str, task_id: str) -> Dict[str, Any]:
+        """Get the status of a task.
+
+        Args:
+            server (str): The worker server URL.
+            task_id (str): The task identifier.
+
+        Returns:
+            Dict[str, Any]: Task status information.
+        """
+        original_worker_server = self.get_worker_server()
         self.set_worker_server(server)
         response = self.send_request("get", f"task/{task_id}")
-        self.set_worker_server(worker_server)
+        self.set_worker_server(original_worker_server)
         return response.json()
 
-    def verify_ssl(self, verify):
-        # requests uses 'verify' param per request, so this is handled in send_request
-        pass
+    def get_updated_info(self) -> Dict[str, Any]:
+        """Get updated information about the account.
 
-    def follow_location(self, follow):
-        # requests handles redirects by default, can be controlled per request
-        pass
-
-    def get_updated_info(self):
+        Returns:
+            Dict[str, Any]: Account information including remaining credits.
+        """
         data = {"v": self.VERSION}
         body = {"data": data}
         response = self.send_request("get", "info", body)
         self.info = response.json()
         return self.info
 
-    def get_info(self):
+    def get_info(self) -> Dict[str, Any]:
+        """Get information about the account.
+
+        Returns:
+            Dict[str, Any]: Account information.
+        """
         return self.get_updated_info()
 
-    def get_remaining_files(self):
-        info = self.get_updated_info()
-        return info.get("remaining_credits")
+    def get_remaining_files(self) -> int:
+        """Get the remaining number of files that can be processed.
+
+        Returns:
+            int: Number of remaining files.
+        """
+        if self.info is None:
+            self.get_updated_info()
+        return self.info.get("remaining_files", 0) if self.info else 0

@@ -1,37 +1,42 @@
+"""Handles HTML to PDF conversion tasks using the iLovePDF API.
+
+Provides the HtmlToPdfTask class to configure and execute HTML to PDF
+conversion.
+Allows setting options such as page orientation, margin, view width, page size,
+and more.
 """
-Module for handling HTML to PDF conversion tasks using the iLovePDF API.
 
-This module defines the HtmlToPdfTask class, which provides methods and properties
-to configure and execute the conversion of HTML content to PDF files. Options such as
-page orientation, margin, view width, page size, and more can be set for the conversion task.
-"""
+from typing import Literal
 
-from .task import ProcessTask
+from ilovepdf.exceptions.int_errors import IntOutOfRangeError
+from ilovepdf.task import Task
+from ilovepdf.validators import BoolValidator, ChoiceValidator, IntValidator
 
-ORIENTATION_VALUES = ("portrait", "landscape")
-PAGESIZE_VALUES = ("A3", "A4", "A5", "A6", "Letter", "Auto")
+PageOrientationType = Literal["portrait", "landscape"]
+PAGE_ORIENTATION_OPTIONS = {"portrait", "landscape"}
+
+PageSizeType = Literal["A3", "A4", "A5", "A6", "Letter", "Auto"]
+PAGE_SIZE_OPTIONS = {"A3", "A4", "A5", "A6", "Letter", "Auto"}
 
 
-class HtmlToPdfTask(ProcessTask):
+class HtmlToPdfTask(Task):
     """
-    Class to handle the HTML to PDF conversion task using the iLovePDF API.
+    Handles HTML to PDF conversion tasks using the iLovePDF API.
 
-    This class allows you to configure and execute the conversion of HTML content to PDF files.
-    You can set options such as page orientation, margin, view width, page size, and more.
+    Args:
+        public_key (str, optional): API public key.
+            Uses ILOVEPDF_PUBLIC_KEY env variable if not provided.
+        secret_key (str, optional): API secret key.
+            Uses ILOVEPDF_SECRET_KEY env variable if not provided.
+        make_start (bool, optional): Start the task immediately. Default is False.
+
+    Example:
+        task = HtmlToPdfTask(public_key="your_public_key", secret_key="your_secret_key")
     """
 
-    def __init__(self, public_key=None, secret_key=None, make_start=True):
-        """
-        Initialize the HtmlToPdfTask.
+    _tool = "htmlpdf"
 
-        Args:
-            public_key (Optional[str]): The public API key.
-            secret_key (Optional[str]): The secret API key.
-            make_start (bool): Whether to start the task immediately.
-        """
-        super().__init__(public_key, secret_key, make_start, tool="htmlpdf")
-
-    DEFAULTS_VALUES = {
+    _DEFAULT_PAYLOAD = {
         "page_orientation": "portrait",
         "page_margin": 0,
         "view_width": 1920,
@@ -42,148 +47,162 @@ class HtmlToPdfTask(ProcessTask):
     }
 
     @property
-    def page_orientation(self) -> str:
+    def page_orientation(self) -> PageOrientationType:
         """
-        Get the current page orientation.
+        Gets the current page orientation. Default is 'portrait'.
 
         Returns:
-            str: The page orientation ("portrait" or "landscape").
+            PageOrientationType: The current orientation.
         """
-        return self._params.get("page_orientation", False)
+        return self._get_attr("page_orientation")
 
     @page_orientation.setter
-    def page_orientation(self, orientation: str):
+    def page_orientation(self, value: PageOrientationType):
         """
-        Set the page orientation for the task.
+        Sets the page orientation.
 
         Args:
-            orientation (str): "portrait" or "landscape".
+            value (PageOrientationType): Must be one of PAGE_ORIENTATION_OPTIONS.
 
         Raises:
-            ValueError: If orientation is not valid.
+            InvalidChoiceError: If the provided value is not valid.
         """
-        if orientation not in ORIENTATION_VALUES:
-            raise ValueError("Invalid orientation")
-        self._params["page_orientation"] = orientation
+        ChoiceValidator.validate(value, PAGE_ORIENTATION_OPTIONS, "page_orientation")
+        self._set_attr("page_orientation", value)
 
     @property
     def page_margin(self) -> int:
         """
-        Get the current page margin.
+        Gets the current page margin in points. Default is 0.
 
         Returns:
-            int: The page margin in points.
+            int: The current page margin.
         """
-        return self._params.get("page_margin", 0)
+        return self._get_attr("page_margin")
 
     @page_margin.setter
-    def page_margin(self, margin: int):
+    def page_margin(self, value: int):
         """
-        Set the page margin for the task.
+        Sets the page margin in points.
 
         Args:
-            margin (int): The page margin in points.
+            value (int): Must be a non-negative integer.
+
+        Raises:
+            IntOutOfRangeError: If the value is negative.
         """
-        self._params["page_margin"] = margin
+        IntValidator.validate_type(value, "page_margin")
+        if value < 0:
+            raise IntOutOfRangeError("Invalid page_margin: value must be >= 0.")
+        self._set_attr("page_margin", value)
 
     @property
     def view_width(self) -> int:
         """
-        Get the current view width.
+        Gets the current view width in pixels. Default is 1920.
 
         Returns:
-            int: The view width in pixels.
+            int: The current view width.
         """
-        return self._params.get("view_width", self.DEFAULTS_VALUES["view_width"])
+        return self._get_attr("view_width")
 
     @view_width.setter
-    def view_width(self, width: int):
+    def view_width(self, value: int):
         """
-        Set the view width for the task.
+        Sets the view width in pixels.
 
         Args:
-            width (int): The view width in pixels.
+            value (int): Must be a positive integer.
+
+        Raises:
+            IntOutOfRangeError: If the value is not positive.
         """
-        self._params["view_width"] = width
+        IntValidator.validate_positive(value, "view_width")
+        self._set_attr("view_width", value)
 
     @property
-    def page_size(self) -> str:
+    def page_size(self) -> PageSizeType:
         """
-        Get the current page size.
+        Gets the current page size. Default is 'A4'.
 
         Returns:
-            str: The page size (e.g., "A4").
+            PageSizeType: The current page size.
         """
-        return self._params.get("page_size", self.DEFAULTS_VALUES["page_size"])
+        return self._get_attr("page_size")
 
     @page_size.setter
-    def page_size(self, page_size: str):
+    def page_size(self, value: PageSizeType):
         """
-        Set the page size for the task.
+        Sets the page size.
 
         Args:
-            page_size (str): The page size (e.g., "A4").
+            value (PageSizeType): Must be one of PAGE_SIZE_OPTIONS.
+
+        Raises:
+            InvalidChoiceError: If the provided value is not valid.
         """
-        if page_size not in PAGESIZE_VALUES:
-            raise ValueError("Invalid page size")
-        self._params["page_size"] = page_size
+        ChoiceValidator.validate(value, PAGE_SIZE_OPTIONS, "page_size")
+        self._set_attr("page_size", value)
 
     @property
     def single_page(self) -> bool:
         """
-        Get the single page option.
+        Gets the single page option. Default is False.
 
         Returns:
-            bool: True if single page mode is enabled, False otherwise.
+            bool: True if single page mode is enabled.
         """
-        return self._params.get("single_page", self.DEFAULTS_VALUES["single_page"])
+        return self._get_attr("single_page")
 
     @single_page.setter
-    def single_page(self, single_page: bool):
+    def single_page(self, value: bool):
         """
-        Set the single page option.
+        Sets the single page option.
 
         Args:
-            single_page (bool): Enable or disable single page mode.
+            value (bool): Enable or disable single page mode.
         """
-        self._params["single_page"] = single_page
+        BoolValidator.validate(value)
+        self._set_attr("single_page", value)
 
     @property
     def block_ads(self) -> bool:
         """
-        Get the block ads option.
+        Gets the block ads option. Default is False.
 
         Returns:
-            bool: True if ads are blocked, False otherwise.
+            bool: True if ads are blocked.
         """
-        return self._params.get("block_ads", self.DEFAULTS_VALUES["block_ads"])
+        return self._get_attr("block_ads")
 
     @block_ads.setter
-    def block_ads(self, block_ads: bool):
+    def block_ads(self, value: bool):
         """
-        Set the block ads option.
+        Sets the block ads option.
 
         Args:
-            block_ads (bool): Enable or disable ad blocking.
+            value (bool): Enable or disable ad blocking.
         """
-        self._params["block_ads"] = block_ads
+        BoolValidator.validate(value)
+        self._set_attr("block_ads", value)
 
     @property
     def remove_popups(self) -> bool:
         """
-        Get the remove popups option.
+        Gets the remove popups option. Default is False.
 
         Returns:
-            bool: True if popups are removed, False otherwise.
+            bool: True if popups are removed.
         """
-        return self._params.get("remove_popups", self.DEFAULTS_VALUES["remove_popups"])
+        return self._get_attr("remove_popups")
 
     @remove_popups.setter
-    def remove_popups(self, remove_popups: bool):
+    def remove_popups(self, value: bool):
         """
-        Set the remove popups option.
+        Sets the remove popups option.
 
         Args:
-            remove_popups (bool): Enable or disable popup removal.
+            value (bool): Enable or disable popup removal.
         """
-        self._params["remove_popups"] = remove_popups
+        BoolValidator.validate(value)
+        self._set_attr("remove_popups", value)

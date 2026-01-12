@@ -1,38 +1,44 @@
 """Module for handling Office to PDF conversion tasks in iLovePDF."""
 
-from .task import ProcessTask
-
 # pylint: disable=abstract-method
 
 
-class OfficePdfTask(ProcessTask):
+from .exceptions import TooManyFilesError
+from .task import Task
+
+FILE_EXTENSIONS = [
+    "doc",
+    "docx",
+    "ppt",
+    "pptx",
+    "xls",
+    "xlsx",
+    "odt",
+    "odp",
+    "ods",
+]
+
+
+class OfficePdfTask(Task):
     """
     Class to handle the Office to PDF conversion task in iLovePDF.
     """
 
-    def __init__(self, public_key=None, secret_key=None, make_start=True):
-        super().__init__(public_key, secret_key, make_start, tool="officepdf")
+    _tool = "officepdf"
+    _file_extension = FILE_EXTENSIONS
 
-    def _validate_file_extension(self, file_path):
-        allowed_extensions = (
-            ".doc",
-            ".docx",
-            ".ppt",
-            ".pptx",
-            ".xls",
-            ".xlsx",
-            ".odt",
-            ".odp",
-            ".ods",
-        )
-        if not any(file_path.lower().endswith(ext) for ext in allowed_extensions):
-            raise ValueError(
-                "Only Office and OpenDocument files are supported: "
-                "DOC, DOCX, PPT, PPTX, XLS, XLSX, ODT, ODP, ODS"
-            )
+    def append_file(self, file):
+        """Append a file to the task.
 
-    def add_file(self, file_path, extra_params=None):
+        Args:
+            file (File): File to append.
+
+        Raises:
+            TooManyFilesError: If the task already has one file.
+
+        Returns:
+            File: The appended file.
+        """
         if len(self.files) == 1:
-            raise ValueError("OfficePdfTask can only handle one file at a time.")
-        self._validate_file_extension(file_path)
-        return super().add_file(file_path, extra_params)
+            raise TooManyFilesError("OfficePdfTask can only handle one file at a time.")
+        return super().append_file(file)

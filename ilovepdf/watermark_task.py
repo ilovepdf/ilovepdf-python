@@ -1,18 +1,31 @@
+"""Handles PDF watermark tasks using the iLovePDF API.
+
+Provides the WatermarkTask class to configure text or image watermarks,
+including positioning, typography, and rendering options.
 """
-This module defines the WatermarkTask class for interacting with the iLovePDF API
-to add text or image watermarks to PDF documents.
-"""
 
-from typing import Literal, Optional
+from typing import Any, Literal, Optional
 
-from .task import ProcessTask
+from ilovepdf import File
+from ilovepdf.exceptions import IntOutOfRangeError, InvalidChoiceError
+from ilovepdf.task import Task
+from ilovepdf.validators import (
+    BoolValidator,
+    ChoiceValidator,
+    IntValidator,
+    StringValidator,
+)
 
-MODE_VALID = ("text", "image")
-ModeType = Literal["text", "image"]
+WatermarkModeType = Literal["text", "image"]
+WATERMARK_MODE_OPTIONS = {"text", "image"}
 
-VERTICAL_POSITION_VALID = ("bottom", "top", "middle")
-HORIZONTAL_POSITION_VALID = ("left", "center", "right")
-FONT_FAMILY_VALID = (
+VerticalPositionType = Literal["bottom", "top", "middle"]
+VERTICAL_POSITION_OPTIONS = {"bottom", "top", "middle"}
+
+HorizontalPositionType = Literal["left", "center", "right"]
+HORIZONTAL_POSITION_OPTIONS = {"left", "center", "right"}
+
+FontFamilyType = Literal[
     "Arial",
     "Arial Unicode MS",
     "Verdana",
@@ -21,17 +34,55 @@ FONT_FAMILY_VALID = (
     "Comic Sans MS",
     "WenQuanYi Zen Hei",
     "Lohit Marathi",
-)
-FONT_STYLE_VALID = (None, "Bold", "Italic")
-LAYER_VALID = ("above", "below")
+]
+FONT_FAMILY_OPTIONS = {
+    "Arial",
+    "Arial Unicode MS",
+    "Verdana",
+    "Courier",
+    "Times New Roman",
+    "Comic Sans MS",
+    "WenQuanYi Zen Hei",
+    "Lohit Marathi",
+}
+
+FontStyleType = Literal[None, "Bold", "Italic"]
+FONT_STYLE_OPTIONS = {None, "Bold", "Italic"}
+
+LayerType = Literal["above", "below"]
+LAYER_OPTIONS = {"above", "below"}
+
+IMG_FILE_EXTENSIONS = ["jpg", "jpeg", "png", "gif", "bmp", "tiff", "tif", "webp"]
 
 
-class WatermarkTask(ProcessTask):
+class WatermarkTask(Task):
+    """Configure and execute watermark tasks using the iLovePDF API.
+
+    WatermarkTask allows adding text or image watermarks on PDF files with
+    extensive customization. Users can adjust positioning, rotation, typography,
+    color, transparency, and layering before executing the task.
+
+    Args:
+        public_key (str | None): API public key. Uses ``ILOVEPDF_PUBLIC_KEY`` when
+            omitted.
+        secret_key (str | None): API secret key. Uses ``ILOVEPDF_SECRET_KEY`` when
+            omitted.
+        make_start (bool): Whether to start the task immediately. Default is False.
+
+    Example:
+        task = WatermarkTask(public_key="your_public_key", secret_key="your_secret_key")
+        task.add_file("/path/to/document.pdf")
+        task.mode = "text"
+        task.text = "Confidential"
+        task.font_size = 28
+        task.transparency = 60
+        task.execute()
+        task.download("/path/to/output.pdf")
     """
-    Class for the watermark task using the iLovePDF API.
-    """
 
-    DEFAULTS_VALUES = {
+    _tool = "watermark"
+
+    _DEFAULT_PAYLOAD = {
         "mode": "text",
         "text": None,
         "image": None,
@@ -50,210 +101,335 @@ class WatermarkTask(ProcessTask):
         "layer": "above",
     }
 
-    def __init__(self, public_key=None, secret_key=None, make_start=True):
-        super().__init__(public_key, secret_key, make_start, tool="watermark")
+    allowed_extensions = ["pdf"]
 
     @property
-    def mode(self) -> str:
-        return self._params.get("mode", "text")
+    def mode(self) -> WatermarkModeType:
+        """Gets the current watermark mode. Default is "text"."""
+
+        return self._get_attr("mode")
 
     @mode.setter
-    def mode(self, mode: ModeType):
-        """
-        Set the watermark mode for the task.
+    def mode(self, value: WatermarkModeType) -> None:
+        """Sets the watermark mode.
 
-        Accepted values: "text", "image".
-        Default: "text"
+        Args:
+            value (WatermarkModeType): Must be one of WATERMARK_MODE_OPTIONS.
         """
-        if mode not in MODE_VALID:
-            raise ValueError("Invalid mode")
-        self._params["mode"] = mode
+
+        ChoiceValidator.validate(value, WATERMARK_MODE_OPTIONS, "mode")
+        self._set_attr("mode", value)
 
     @property
     def text(self) -> Optional[str]:
-        return self._params.get("text", None)
+        """Gets the text used for text watermarks. Default is None."""
+
+        return self._get_attr("text")
 
     @text.setter
-    def text(self, value: str):
+    def text(self, value: str | None) -> None:
+        """Sets the text used for text watermarks.
+
+        Args:
+            value (str | None): Must be a non-empty string when provided.
         """
-        Text to be stamped. Required if mode is "text".
+
+        if value is None:
+            self._set_attr("text", None)
+            return
+        StringValidator.validate(value, "text")
+        self._set_attr("text", value)
+
+    def set_watermark_image(self, file_path: str, **kwargs: Any) -> File:
         """
-        self._params["text"] = value
+        Uploads and sets an image file to be used as a watermark.
+
+        This method validates the image file extension, uploads it to the server,
+        and configures it as the watermark image for the task.
+
+        Args:
+            file_path (str): Path to the image file to use as watermark.
+            **kwargs (Any): Additional arguments to pass to the upload method.
+
+        Returns:
+            File: The uploaded file object with server filename information.
+
+        Raises:
+            ValueError: If the file extension is not valid for images.
+            ProcessingError: If the task has not been started yet.
+
+        Example:
+            >>> task = WatermarkTask(public_key, secret_key)
+            >>> task.start()
+            >>> watermark_file = task.set_watermark_image('/path/to/logo.png')
+        """
+        file = self._validate_and_upload_file(
+            file_path, extension_list=IMG_FILE_EXTENSIONS, **kwargs
+        )
+        self.image = file.server_filename
+        return file
 
     @property
     def image(self) -> Optional[str]:
-        return self._params.get("image", None)
+        """Gets the server filename used for image watermarks. Default is None."""
+
+        return self._get_attr("image")
 
     @image.setter
-    def image(self, value: str):
+    def image(self, value: str | None) -> None:
+        """Sets the server filename for image watermarks.
+
+        Args:
+            value (str | None): Must be a non-empty string when provided.
         """
-        The image to stamp if mode is "image".
-        Must refer to the server_filename (JPG or PNG).
-        """
-        self._params["image"] = value
+
+        if value is None:
+            self._set_attr("image", None)
+            return
+        StringValidator.validate(value, "image")
+        self._set_attr("image", value)
 
     @property
     def pages(self) -> str:
-        return self._params.get("pages", "all")
+        """Gets the page selection string. Default is "all"."""
+
+        return self._get_attr("pages")
 
     @pages.setter
-    def pages(self, value: str):
+    def pages(self, value: str) -> None:
+        """Sets the page selection string.
+
+        Args:
+            value (str): Page selection expression (e.g., "all", "1,3,5", "2-4").
         """
-        Pages to be stamped. Examples: "all", "3-end", "1,3,4-9".
-        Default: "all"
-        """
-        self._params["pages"] = value
+
+        StringValidator.validate(value, "pages")
+        self._set_attr("pages", value)
 
     @property
-    def vertical_position(self) -> str:
-        return self._params.get("vertical_position", "middle")
+    def vertical_position(self) -> VerticalPositionType:
+        """Gets the vertical position. Default is "middle"."""
+
+        return self._get_attr("vertical_position")
 
     @vertical_position.setter
-    def vertical_position(self, value: str):
+    def vertical_position(self, value: VerticalPositionType) -> None:
+        """Sets the vertical position.
+
+        Args:
+            value (VerticalPositionType): Must be one of VERTICAL_POSITION_OPTIONS.
         """
-        Vertical position: "bottom", "top", "middle". Default: "middle"
-        """
-        if value not in VERTICAL_POSITION_VALID:
-            raise ValueError("Invalid vertical_position")
-        self._params["vertical_position"] = value
+
+        ChoiceValidator.validate(value, VERTICAL_POSITION_OPTIONS, "vertical_position")
+        self._set_attr("vertical_position", value)
 
     @property
-    def horizontal_position(self) -> str:
-        return self._params.get("horizontal_position", "center")
+    def horizontal_position(self) -> HorizontalPositionType:
+        """Gets the horizontal position. Default is "center"."""
+
+        return self._get_attr("horizontal_position")
 
     @horizontal_position.setter
-    def horizontal_position(self, value: str):
+    def horizontal_position(self, value: HorizontalPositionType) -> None:
+        """Sets the horizontal position.
+
+        Args:
+            value (HorizontalPositionType): Must be one of HORIZONTAL_POSITION_OPTIONS.
         """
-        Horizontal position: "left", "center", "right". Default: "center"
-        """
-        if value not in HORIZONTAL_POSITION_VALID:
-            raise ValueError("Invalid horizontal_position")
-        self._params["horizontal_position"] = value
+
+        ChoiceValidator.validate(
+            value, HORIZONTAL_POSITION_OPTIONS, "horizontal_position"
+        )
+        self._set_attr("horizontal_position", value)
 
     @property
     def vertical_position_adjustment(self) -> int:
-        return self._params.get("vertical_position_adjustment", 0)
+        """Gets the vertical adjustment in pixels. Default is 0."""
+
+        return self._get_attr("vertical_position_adjustment")
 
     @vertical_position_adjustment.setter
-    def vertical_position_adjustment(self, value: int):
+    def vertical_position_adjustment(self, value: int) -> None:
+        """Sets the vertical adjustment in pixels.
+
+        Args:
+            value (int): Must be between -1000 and 1000 inclusive.
         """
-        Offset pixels from vertical position. Accepts positive/negative values.
-        """
-        self._params["vertical_position_adjustment"] = int(value)
+
+        IntValidator.validate_type(value, "vertical_position_adjustment")
+        if not -1000 <= value <= 1000:
+            raise IntOutOfRangeError(
+                "vertical_position_adjustment must be between -1000 and 1000."
+            )
+        self._set_attr("vertical_position_adjustment", value)
 
     @property
     def horizontal_position_adjustment(self) -> int:
-        return self._params.get("horizontal_position_adjustment", 0)
+        """Gets the horizontal adjustment in pixels. Default is 0."""
+
+        return self._get_attr("horizontal_position_adjustment")
 
     @horizontal_position_adjustment.setter
-    def horizontal_position_adjustment(self, value: int):
+    def horizontal_position_adjustment(self, value: int) -> None:
+        """Sets the horizontal adjustment in pixels.
+
+        Args:
+            value (int): Must be between -1000 and 1000 inclusive.
         """
-        Offset pixels from horizontal position. Accepts positive/negative values.
-        """
-        self._params["horizontal_position_adjustment"] = int(value)
+
+        IntValidator.validate_type(value, "horizontal_position_adjustment")
+        if not -1000 <= value <= 1000:
+            raise IntOutOfRangeError(
+                "horizontal_position_adjustment must be between -1000 and 1000."
+            )
+        self._set_attr("horizontal_position_adjustment", value)
 
     @property
     def mosaic(self) -> bool:
-        return self._params.get("mosaic", False)
+        """Gets the mosaic flag. Default is False."""
+
+        return self._get_attr("mosaic")
 
     @mosaic.setter
-    def mosaic(self, value: bool):
+    def mosaic(self, value: bool) -> None:
+        """Sets the mosaic flag.
+
+        Args:
+            value (bool): Must be a boolean.
         """
-        If true, stamps the image or text 9 times per page. Default: False
-        """
-        self._params["mosaic"] = bool(value)
+
+        BoolValidator.validate(value, "mosaic")
+        self._set_attr("mosaic", value)
 
     @property
     def rotation(self) -> int:
-        return self._params.get("rotation", 0)
+        """Gets the rotation angle in degrees. Default is 0."""
+
+        return self._get_attr("rotation")
 
     @rotation.setter
-    def rotation(self, value: int):
+    def rotation(self, value: int) -> None:
+        """Sets the rotation angle in degrees.
+
+        Args:
+            value (int): Must be between 0 and 360 inclusive.
         """
-        Angle of rotation (0-360). Default: 0
-        """
-        if not 0 <= int(value) <= 360:
-            raise ValueError("rotation must be between 0 and 360")
-        self._params["rotation"] = int(value)
+
+        IntValidator.validate_range(value, 0, 360, "rotation")
+        self._set_attr("rotation", value)
 
     @property
-    def font_family(self) -> str:
-        return self._params.get("font_family", "Arial Unicode MS")
+    def font_family(self) -> FontFamilyType:
+        """Gets the font family. Default is "Arial Unicode MS"."""
+
+        return self._get_attr("font_family")
 
     @font_family.setter
-    def font_family(self, value: str):
+    def font_family(self, value: FontFamilyType) -> None:
+        """Sets the font family.
+
+        Args:
+            value (FontFamilyType): Must be one of FONT_FAMILY_OPTIONS.
         """
-        Font family. Default: "Arial Unicode MS"
-        """
-        if value not in FONT_FAMILY_VALID:
-            raise ValueError("Invalid font_family")
-        self._params["font_family"] = value
+
+        ChoiceValidator.validate(value, FONT_FAMILY_OPTIONS, "font_family")
+        self._set_attr("font_family", value)
 
     @property
-    def font_style(self) -> Optional[str]:
-        return self._params.get("font_style", None)
+    def font_style(self) -> FontStyleType:
+        """Gets the font style. Default is None."""
+
+        return self._get_attr("font_style")
 
     @font_style.setter
-    def font_style(self, value: Optional[str]):
+    def font_style(self, value: FontStyleType) -> None:
+        """Sets the font style.
+
+        Args:
+            value (FontStyleType): Must be one of FONT_STYLE_OPTIONS.
         """
-        Font style: None (Regular), "Bold", "Italic". Default: None
-        """
-        if value not in FONT_STYLE_VALID:
-            raise ValueError("Invalid font_style")
-        self._params["font_style"] = value
+
+        ChoiceValidator.validate(value, FONT_STYLE_OPTIONS, "font_style")
+        self._set_attr("font_style", value)
 
     @property
     def font_size(self) -> int:
-        return self._params.get("font_size", 14)
+        """Gets the font size in points. Default is 14."""
+
+        return self._get_attr("font_size")
 
     @font_size.setter
-    def font_size(self, value: int):
+    def font_size(self, value: int) -> None:
+        """Sets the font size in points.
+
+        Args:
+            value (int): Must be between 1 and 500 inclusive.
         """
-        Font size. Default: 14
-        """
-        self._params["font_size"] = int(value)
+
+        IntValidator.validate_range(value, 1, 500, "font_size")
+        self._set_attr("font_size", value)
 
     @property
     def font_color(self) -> str:
-        return self._params.get("font_color", "#000000")
+        """Gets the font color in hexadecimal format. Default is "#000000"."""
+
+        return self._get_attr("font_color")
 
     @font_color.setter
-    def font_color(self, value: str):
+    def font_color(self, value: str) -> None:
+        """Sets the font color in hexadecimal format.
+
+        Args:
+            value (str): Must be a valid non-empty string.
         """
-        Hexadecimal font color. Default: "#000000"
-        """
-        self._params["font_color"] = value
+
+        StringValidator.validate(value, "font_color")
+        self._set_attr("font_color", value)
 
     @property
     def transparency(self) -> int:
-        return self._params.get("transparency", 100)
+        """Gets the transparency percentage. Default is 100."""
+
+        return self._get_attr("transparency")
 
     @transparency.setter
-    def transparency(self, value: int):
+    def transparency(self, value: int) -> None:
+        """Sets the transparency percentage.
+
+        Args:
+            value (int): Must be between 1 and 100 inclusive.
         """
-        Opacity percentage (1-100). Default: 100
-        """
-        if not 1 <= int(value) <= 100:
-            raise ValueError("transparency must be between 1 and 100")
-        self._params["transparency"] = int(value)
+
+        IntValidator.validate_range(value, 1, 100, "transparency")
+        self._set_attr("transparency", value)
 
     @property
-    def layer(self) -> str:
-        return self._params.get("layer", "above")
+    def layer(self) -> LayerType:
+        """Gets the layer setting. Default is "above"."""
+
+        return self._get_attr("layer")
 
     @layer.setter
-    def layer(self, value: str):
-        """
-        Layer: "above" (over content), "below" (below content). Default: "above"
-        """
-        if value not in LAYER_VALID:
-            raise ValueError("Invalid layer")
-        self._params["layer"] = value
+    def layer(self, value: LayerType) -> None:
+        """Sets the layer setting.
 
-    def _to_dict(self):
-        data = super()._to_dict()
-        if data.get("mode") == "text" and not data.get("text"):
-            raise ValueError("Text is required when mode is 'text'")
-        if data.get("mode") == "image" and not data.get("image"):
-            raise ValueError("Image is required when mode is 'image'")
-        return {k: v for k, v in data.items() if v is not None}
+        Args:
+            value (LayerType): Must be one of LAYER_OPTIONS.
+        """
+
+        ChoiceValidator.validate(value, LAYER_OPTIONS, "layer")
+        self._set_attr("layer", value)
+
+    def _to_payload(self) -> dict:
+        """Serializes the watermark configuration for API submission."""
+
+        payload = super()._to_payload()
+        mode = payload.get("mode")
+        if mode == "text" and not payload.get("text"):
+            raise InvalidChoiceError("Text value must be provided for text watermark.")
+        if mode == "image" and not payload.get("image"):
+            raise InvalidChoiceError(
+                "Image value must be provided for image watermark."
+            )
+        payload = {key: value for key, value in payload.items() if value is not None}
+        return payload

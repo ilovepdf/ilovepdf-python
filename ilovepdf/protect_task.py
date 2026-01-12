@@ -1,36 +1,57 @@
-"""ProtectTask for the iLovePDF Python API.
-Handles PDF protection tasks, such as setting passwords and permissions.
+"""Handles PDF protection tasks using the iLovePDF API.
+
+Provides the ProtectTask class to set passwords and permissions on PDF files.
 """
 
-# pylint: disable=abstract-method
+from .task import Task
+from .validators import StringValidator
 
-from .task import ProcessTask
 
-
-class ProtectTask(ProcessTask):
+class ProtectTask(Task):
     """
-    ProtectTask for the iLovePDF Python API.
-    Handles PDF protection tasks, such as setting passwords and permissions.
+    Handles PDF protection tasks using the iLovePDF API.
+
+    Allows setting a password to protect PDF files. The password must be a non-empty
+    string and must be set before executing the task.
+
+    Example:
+        task = ProtectTask(public_key="your_public_key", secret_key="your_secret")
+        task.add_file("/path/to/document.pdf")
+        task.password = "mysecurepassword"
+        task.execute()
+        task.download("/path/to/output.pdf")
     """
 
-    def __init__(self, public_key, secret_key, make_start=True):
-        super().__init__(public_key, secret_key, make_start, tool="protect")
-        self.password = None
+    _tool = "protect"
 
-    def set_password(self, password: str):
-        if not isinstance(password, str) or not password:
-            raise ValueError("Password must be a non-empty string")
-        self.password = password
-        return self
+    _DEFAULT_PAYLOAD = {
+        "password": None,
+    }
 
-    def add_file(self, file_path, extra_params=None):
-        self._validate_file_extension(file_path)
-        return super().add_file(file_path, extra_params)
+    REQUIRED_FIELDS = ["password"]
 
-    def _to_dict(self):
+    @property
+    def password(self) -> str:
         """
-        Converts the ProtectTask instance to a dictionary, including the password option.
+        Gets the password used to protect the PDF.
+
+        Raises:
+            NotImplementedError: Always, as the password cannot be accessed directly.
         """
-        base = super()._to_dict()
-        base["password"] = self.password
-        return base
+        raise NotImplementedError("Password cannot be accessed directly")
+
+    @password.setter
+    def password(self, value: str) -> None:
+        """
+        Sets the password used to protect the PDF.
+
+        Args:
+            value (str): Must be a non-empty string.
+
+        Raises:
+            TypeError: If the password is not a string.
+            ValueError: If the password is an empty string.
+        """
+
+        StringValidator.validate(value, "password")
+        self._set_attr("password", value)

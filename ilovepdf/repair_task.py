@@ -1,25 +1,41 @@
-"""
-Module for RepairTask in the iLovePDF Python API.
+"""Handles PDF repair tasks using the iLovePDF API.
 
-This module provides the RepairTask class, which handles PDF repair tasks,
-such as fixing corrupted PDF files.
+Provides the RepairTask class to fix corrupted PDF files.
 """
 
 # pylint: disable=abstract-method
 
-from .task import ProcessTask
+from .task import Task
 
 
-class RepairTask(ProcessTask):
+class RepairTask(Task):
     """
-    RepairTask for the iLovePDF Python API.
-    Handles PDF repair tasks, such as fixing corrupted PDF files.
+    Handles PDF repair tasks using the iLovePDF API.
+
+    Allows uploading a single PDF file to attempt repair of corruption or errors.
+
+    Example:
+        task = RepairTask(public_key="your_public_key", secret_key="your_secret")
+        task.add_file("/path/to/corrupted.pdf")
+        task.execute()
+        task.download("/path/to/repaired.pdf")
     """
 
-    def __init__(self, public_key, secret_key, make_start=True):
-        super().__init__(public_key, secret_key, make_start, tool="repair")
+    _tool = "repair"
 
-    def add_file(self, file_path, extra_params=None):
+    def append_file(self, file: str):
+        """
+        Adds a PDF file to the repair task.
+
+        Args:
+            file (str): Path to the PDF file to repair.
+
+        Raises:
+            ValueError: If more than one file is added to the task.
+
+        Returns:
+            File: The added file object.
+        """
         if len(self.files) == 1:
             raise ValueError("RepairTask can only handle one file at a time.")
-        return super().add_file(file_path, extra_params)
+        return super().append_file(file)
