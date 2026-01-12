@@ -1,72 +1,66 @@
 """Unit tests for the RotateTask class in the ilovepdf module."""
 
-from unittest.mock import patch
-
 import pytest
 
-from ilovepdf import File, RotateTask
+from ilovepdf import RotateTask
+from ilovepdf.exceptions import InvalidChoiceError
+from ilovepdf.rotate_task import ROTATE_ANGLE_OPTIONS, RotateFile
+
+from .base_test import AbstractUnitFileTest, AbstractUnitTaskTest
 
 
-class TestRotateTask:
-    """Unit tests for the RotateTask class."""
+# pylint: disable=protected-access
+class TestRotateFile(AbstractUnitFileTest):
+    """Unit tests for the RotateFile class."""
 
-    @pytest.fixture
-    def rotate_task(self):
-        """Fixture that creates a RotateTask instance for testing."""
-        task = RotateTask("public_key", "secret_key", make_start=False)
-        return task
+    _task_class = RotateFile
 
-    def test_initialization_sets_default_values(self, rotate_task):
+    def test_initialization_sets_default_values(self, my_task):
         """
-        Ensure RotateTask is initialized with default values.
-        Checks that the default rotation is None and the tool is set to 'rotate'.
+        Test that the RotateFile class initializes with default values.
         """
-        assert rotate_task.tool == "rotate", "Tool should be set to 'rotate'"
+        assert ROTATE_ANGLE_OPTIONS == {0, 90, 180, 270}
+        assert my_task._DEFAULT_PAYLOAD == {
+            "server_filename": None,
+            "filename": None,
+            "rotate": 0,
+        }
+        assert my_task.rotate == 0
 
-    def test_add_file_returns_file_with_set_rotation(self, rotate_task):
-        dummy_file = File("server_filename.pdf", "sample.pdf")
-        rotate_task.task = "dummy_task_id"
-        with patch.object(rotate_task, "upload_file", return_value=dummy_file):
-            file = rotate_task.add_file("sample.pdf")
-            assert hasattr(file, "set_rotation")
-            file.set_rotation(90)
-            assert file.rotate == 90
-
-    @pytest.mark.parametrize("angle", [90, 180, 270])
-    def test_set_rotation_valid_angles(self, rotate_task, angle):
-        dummy_file = File("server_filename.pdf", "sample.pdf")
-        rotate_task.task = "dummy_task_id"
-        with patch.object(rotate_task, "upload_file", return_value=dummy_file):
-            file = rotate_task.add_file("sample.pdf")
-            file.set_rotation(angle)
-            assert file.rotate == angle
+    @pytest.mark.parametrize("angle", ROTATE_ANGLE_OPTIONS)
+    def test_set_rotation_valid_angles(self, my_task, angle):
+        """
+        Test that the RotateFile class sets the rotation angle correctly for valid
+        angles.
+        """
+        my_task.rotate = angle
+        assert my_task.rotate == angle
 
     @pytest.mark.parametrize("invalid_angle", [-90, 45, 100, 360, None, "90"])
-    def test_set_rotation_invalid_angles(self, rotate_task, invalid_angle):
-        dummy_file = File("server_filename.pdf", "sample.pdf")
-        rotate_task.task = "dummy_task_id"
-        with patch.object(rotate_task, "upload_file", return_value=dummy_file):
-            file = rotate_task.add_file("sample.pdf")
-            with pytest.raises(ValueError):
-                file.set_rotation(invalid_angle)
+    def test_set_rotation_invalid_angles(self, my_task, invalid_angle):
+        """
+        Test that the RotateFile class raises an InvalidChoiceError when setting
+        an invalid rotation angle.
+        """
+        with pytest.raises(InvalidChoiceError):
+            my_task.rotate = invalid_angle
 
-    def test_execute_and_download_are_called(self, rotate_task):
-        dummy_file = File("server_filename.pdf", "sample.pdf")
-        rotate_task.task = "dummy_task_id"
-        with (
-            patch.object(rotate_task, "upload_file", return_value=dummy_file),
-            patch.object(rotate_task, "execute", return_value=None) as mock_execute,
-            patch.object(
-                rotate_task, "set_output_filename", return_value=None
-            ) as mock_set_output,
-            patch.object(rotate_task, "download", return_value=None) as mock_download,
-        ):
-            file = rotate_task.add_file("sample.pdf")
-            file.set_rotation(180)
-            rotate_task.execute()
-            rotate_task.set_output_filename("document_rotated.pdf")
-            rotate_task.download()
-            mock_execute.assert_called_once()
-            mock_set_output.assert_called_once_with("document_rotated.pdf")
-            mock_download.assert_called_once()
-            assert file.rotate == 180
+    @pytest.mark.parametrize("angle", ROTATE_ANGLE_OPTIONS)
+    def test_to_payload_includes_rotate_angle(self, my_task, angle):
+        """
+        Test that _to_payload includes the rotate angle.
+        """
+        my_task.rotate = angle
+        payload = my_task._to_payload()
+        assert "rotate" in payload
+        assert payload["rotate"] == angle
+
+
+class TestRotateTask(AbstractUnitTaskTest):
+    """Unit tests for the RotateTask class."""
+
+    _task_class = RotateTask
+    _task_tool = "rotate"
+
+    def test_init(self):
+        """Test RotateTask initialization and inheritance."""

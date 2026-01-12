@@ -1,27 +1,35 @@
 """Unit tests for the OfficePdfTask class."""
 
-from unittest.mock import patch
-
 import pytest
 
 from ilovepdf import OfficePdfTask
-from ilovepdf.task import ProcessTask
+from ilovepdf.exceptions import FileExtensionNotAllowed, TooManyFilesError
+
+from .base_test import AbstractUnitTaskTest
 
 
-class TestOfficePdfTask:
+# pylint: disable=protected-access
+class TestOfficePdfTask(AbstractUnitTaskTest):
     """Unit tests for the OfficePdfTask class."""
 
-    @pytest.fixture
-    def office_pdf_task(self):
-        """Fixture that creates an OfficePdfTask instance for testing."""
-        task = OfficePdfTask("public_key", "secret_key", make_start=False)
-        return task
+    _task_class = OfficePdfTask
+    _task_tool = "officepdf"
 
-    def test_initialization_sets_default_values(self, office_pdf_task):
+    def test_initialization_sets_default_values(self, my_task):
         """
         Ensure OfficePdfTask is initialized with default values.
         """
-        assert office_pdf_task.tool == "officepdf", "Tool should be set to 'officepdf'"
+        assert my_task.get_extension_list() == [
+            "doc",
+            "docx",
+            "ppt",
+            "pptx",
+            "xls",
+            "xlsx",
+            "odt",
+            "odp",
+            "ods",
+        ]
 
     @pytest.mark.parametrize(
         "file_path",
@@ -38,7 +46,10 @@ class TestOfficePdfTask:
         ],
     )
     def test_validate_file_extension_accepts_valid_extensions(
-        self, office_pdf_task, file_path, tmp_path
+        self,
+        my_task,
+        file_path,
+        tmp_path,
     ):
         """
         Ensure valid Office and OpenDocument extensions are accepted.
@@ -46,10 +57,7 @@ class TestOfficePdfTask:
         # Create a simulated temporary file
         temp_file = tmp_path / file_path
         temp_file.write_text("dummy content")
-        # Should not raise exception
-        # pylint: disable=protected-access
-        office_pdf_task._validate_file_extension(str(temp_file))
-        # pylint: enable=protected-access
+        my_task._validate_file_extension(str(temp_file))
 
     @pytest.mark.parametrize(
         "file_path",
@@ -64,31 +72,26 @@ class TestOfficePdfTask:
         ],
     )
     def test_validate_file_extension_rejects_invalid_extensions(
-        self, office_pdf_task, file_path, tmp_path
+        self, my_task, file_path, tmp_path
     ):
         """
         Ensure invalid extensions are rejected.
         """
         temp_file = tmp_path / file_path
         temp_file.write_text("dummy content")
-        with pytest.raises(
-            ValueError, match="Only Office and OpenDocument files are supported"
-        ):
-            # pylint: disable=protected-access
-            office_pdf_task._validate_file_extension(str(temp_file))
-            # pylint: enable=protected-access
+        with pytest.raises(FileExtensionNotAllowed):
+            my_task._validate_file_extension(str(temp_file))
 
-    def test_add_file_allows_only_one_file(self, office_pdf_task, tmp_path):
+    def test_add_file_allows_only_one_file(self, my_task, tmp_path):
         """
         Ensure that only one file can be added to OfficePdfTask.
         """
         valid_file = tmp_path / "document.docx"
         valid_file.write_text("dummy content")
-        office_pdf_task.files = [str(valid_file)]
+        my_task.append_file(str(valid_file))
+
         another_file = tmp_path / "presentation.pptx"
         another_file.write_text("dummy content")
-        with patch.object(ProcessTask, "add_file", return_value=None):
-            with pytest.raises(
-                ValueError, match="OfficePdfTask can only handle one file at a time."
-            ):
-                office_pdf_task.add_file(str(another_file))
+
+        with pytest.raises(TooManyFilesError):
+            my_task.append_file(str(another_file))

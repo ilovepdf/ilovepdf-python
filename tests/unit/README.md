@@ -1,59 +1,110 @@
 # Unit Tests
 
-This directory contains unit tests for the iLovePDF Python library.
+This folder contains unit tests for the core modules and classes of the `ilovepdf` Python library.
 
-Unit tests verify the functionality of individual modules and classes in isolation, ensuring correctness and robustness without relying on external services.
+## Purpose
 
-For general requirements, project structure, troubleshooting, and usage examples, see [tests/README.md](../README.md).
+Unit tests are designed to verify the correctness of individual functions, classes, and methods in isolation, without requiring access to external services or the iLovePDF API. These tests help ensure that the internal logic of the library works as expected.
 
-## Naming Conventions and Dependencies
+## Structure
 
-- All unit test files should be named using the pattern `test_<feature>.py`.
-- Test functions and classes should be prefixed with `test_`.
-- Unit tests use [pytest](https://docs.pytest.org/) and may use Python's `unittest.mock` for isolation.
-- If additional dependencies are required, list them in the test file or in the main requirements.
+- Each test file targets a specific module or class in the `ilovepdf/` directory.
+- Test files are named according to the module or feature they cover, typically following the pattern: `test_<module>.py`.
+- Tests are organized by functionality, ensuring focused validation and comprehensive coverage.
 
-## Test Files Summary
+## Test Files
 
-| File Name                    | Description                                                                                      |
-|------------------------------|--------------------------------------------------------------------------------------------------|
-| test_ilovepdf.py             | Tests the `Ilovepdf` class: authentication, credential management, token caching, error handling.|
-| test_file.py                 | Tests the `File` class: initialization, rotation, password management, file options, PDF page sanitization, form handling.|
-| test_upload_files.py         | Tests file upload functionality in `Task` and `File` classes: task creation, file size validation, error handling, multiple uploads.|
-| test_ilovepdf_auth_manager.py| Tests the `IlovepdfAuthManager` class: authentication and credentials management using the main class as backend.|
-| test_compress_task.py        | Tests the `CompressTask` class: PDF compression functionality and compression level management.   |
-| test_split_task.py           | Tests the `SplitTask` class: PDF splitting functionality and split mode management.              |
-| test_unlock_task.py          | Tests the `UnlockTask` class: PDF unlocking functionality and password removal process.          |
-| test_protect_task.py         | Tests the `ProtectTask` class: PDF protection functionality and password setting process.        |
-| test_repair_task.py          | Tests the `RepairTask` class: PDF repair functionality and error recovery process.               |
-| test_merge_task.py           | Tests the `MergeTask` class: PDF merging functionality and file combination process.             |
-| test_office_pdf_task.py      | Tests the `OfficePdfTask` class: Office to PDF conversion, file extension validation, single-file enforcement.|
-| test_pdfocr_task.py         | Tests the `PdfOcrTask` class: OCR language management, file addition, task execution.            |
-| test_imagepdf_task.py        | Tests the `ImagePdfTask` class: image-to-PDF conversion, orientation, margin, page size, merge options.|
-| test_rotate_task.py          | Tests the `RotateTask` class: PDF page rotation, file addition, task execution.                  |
-| test_pdftopdfa_task.py       | Tests the `PdfToPdfATask` class: PDF/A conformance, downgrade options, parameter validation.     |
-| test_extract_task.py         | Tests the `ExtractTask` class: text extraction from PDF files and detailed extraction options.   |
-| test_watermark_task.py       | Tests the `WatermarkTask` class: watermark mode, text/image parameters, position, font, transparency, layer, validation logic.|
+### Core API and Authentication
 
-_Add new entries to the table above as more unit tests are added._
+- `test_ilovepdf.py` - Ilovepdf core class and API initialization
+- `test_ilovepdf_auth_manager.py` - Authentication manager and credential handling
+- `test_error_router.py` - ErrorRouter error handling and exception routing
 
-## Links
+### Task Classes
 
-- [Main README](../../README.md)
-- [Integration Tests README](../integration/README.md)
-- [Samples README](../../samples/README.md)
-- [Official iLovePDF API Documentation](https://developer.ilovepdf.com/docs)
+- `test_task.py` - Base Task class with file management and validation
+- `test_task_methods.py` - Task class methods (start, upload_file, download, execute, get_status)
+- `test_compress_task.py` - CompressTask validation and compression level settings
+- `test_extract_task.py` - ExtractTask extraction parameters and detailed mode
+- `test_htmltopdf_task.py` - HtmlToPdfTask HTML-to-PDF conversion parameters
+- `test_imagepdf_task.py` - ImagePdfTask image-to-PDF conversion and parameter validation
+- `test_merge_task.py` - MergeTask basic instantiation and payload
+- `test_office_pdf_task.py` - OfficePdfTask office file extension validation and single-file enforcement
+- `test_pdfocr_task.py` - PdfOcrTask and OcrFile OCR language configuration
+- `test_pdftopdfa_task.py` - PdfToPdfATask PDF/A conformance and downgrade options
+- `test_protect_task.py` - ProtectTask password protection and payload validation
+- `test_repair_task.py` - RepairTask single-file enforcement and initialization
+- `test_rotate_task.py` - RotateTask rotation angles and validation
+- `test_sign_task.py` - SignTask signer and file management, property setters, and full flow
+- `test_signer_file.py` - SignerFile file and element management for signature tasks
+- `test_sign_signer.py` - Signer signer type, access code, and file association
+- `test_split_task.py` - SplitTask split modes, parameter validation, and payload
+- `test_unlock_task.py` - UnlockTask basic instantiation and payload
+- `test_watermark_task.py` - WatermarkTask watermarking features
+- `test_removebackground_task.py` - RemoveBackgroundTask initialization and configuration
+
+### Validators
+
+- `test_bool_validator.py` - BoolValidator strict boolean validation
+- `test_choice_validator.py` - Choice validation for restricted value sets
+- `test_int_validator.py` - Integer validation with range and option constraints
+- `test_string_validator.py` - StringValidator string type and non-empty validation
+
+### Exception Handling
+
+- `test_base_custom_exception.py` - BaseCustomException features and behavior
+- `test_process_exception.py` - ProcessException handling
+- `test_int_errors.py` - Integer validation error exceptions
+
+### Utilities and Builders
+
+- `test_payload_builder.py` - PayloadBuilder for request payload construction
+
+### Base Infrastructure
+
+- `base_test.py` - Reusable test fixtures and base classes (no direct tests)
 
 ## How to Run Unit Tests
 
-To execute all unit tests in this directory, run:
-
+Run all unit tests:
 ```bash
-pytest tests/unit
+pytest tests/unit -q
 ```
 
-You can also run a specific test file:
-
+Run specific test file:
 ```bash
-pytest tests/unit/test_compress_task.py
+pytest tests/unit/test_<module>.py -v
 ```
+
+Run with coverage report:
+```bash
+pytest tests/unit --cov=ilovepdf --cov-report=term
+```
+
+Run specific test class:
+```bash
+pytest tests/unit/test_<module>.py::TestClassName -v
+```
+
+Run tests matching a pattern:
+```bash
+pytest tests/unit -k "compress" -v
+```
+
+## Test Quality Standards
+
+- **Focused Scope**: Each test validates specific functionality relevant to its module
+- **Edge Cases**: Important edge cases and error conditions are thoroughly tested
+- **Isolation**: Tests use mocking to avoid dependencies on external services
+- **Clarity**: Test names clearly describe what is being tested
+- **Maintainability**: Organized structure with consistent naming conventions
+
+## Notes
+
+- All new modules and public methods in `ilovepdf/` should have corresponding unit tests here.
+- Each test file should start with a module-level docstring describing its purpose.
+- Use `AbstractUnitTaskTest` as the base class for task-related unit tests.
+- Include the line `# pylint: disable=protected-access` at the top of test files that access protected members.
+- When adding new tests, update this README to reflect the changes.
+
+---

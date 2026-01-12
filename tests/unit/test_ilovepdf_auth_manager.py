@@ -1,12 +1,12 @@
 """Unit tests for the IlovepdfAuthManager class in the ilovepdf module."""
 
-from typing import Optional
-from unittest.mock import MagicMock, patch
-
 import pytest
+from pytest_mock import MockerFixture
 
 from ilovepdf.exceptions.auth_exception import AuthException
 from ilovepdf.ilovepdf_api import Ilovepdf
+
+# pylint: disable=missing-function-docstring
 
 
 class IlovepdfAuthManager:
@@ -15,20 +15,18 @@ class IlovepdfAuthManager:
     using the Ilovepdf class internally.
     """
 
-    def __init__(
-        self, public_key: Optional[str] = None, secret_key: Optional[str] = None
-    ):
+    def __init__(self, public_key: str | None = None, secret_key: str | None = None):
         # Always provide a non-empty secret_key for testing purposes if not given
-        if secret_key is None:
-            secret_key = "dummy_secret"
+        public_key = public_key or "dummy_key"
+        secret_key = secret_key or "dummy_secret"
         self._ilovepdf = Ilovepdf(public_key=public_key, secret_key=secret_key)
 
     def set_credentials(
         self,
-        public_key: Optional[str] = None,
-        secret_key: Optional[str] = None,
+        public_key: str | None = None,
+        secret_key: str | None = None,
     ):
-        self._ilovepdf.set_api_keys(public_key, secret_key)
+        self._ilovepdf.set_api_keys(public_key, secret_key)  # type: ignore
 
     def get_token(self):
         return self._ilovepdf.get_token()
@@ -54,9 +52,9 @@ class TestIlovepdfAuthManager:
         assert manager.get_public_key() == "pub_key"
         assert manager.get_secret_key() == "sec_key"
 
-    @patch("requests.request")
-    def test_get_token(self, mock_request):
-        mock_response = MagicMock()
+    def test_get_token(self, mocker: MockerFixture):
+        mock_request = mocker.patch("requests.request")
+        mock_response = mocker.MagicMock()
         mock_response.json.return_value = {"token": "token_cache"}
         mock_response.status_code = 200
         mock_request.return_value = mock_response
@@ -66,9 +64,9 @@ class TestIlovepdfAuthManager:
         assert token == "token_cache"
         assert manager.token_actual() == "token_cache"
 
-    @patch("requests.request")
-    def test_token_is_reusable(self, mock_request):
-        mock_response = MagicMock()
+    def test_token_is_reusable(self, mocker: MockerFixture):
+        mock_request = mocker.patch("requests.request")
+        mock_response = mocker.MagicMock()
         mock_response.json.return_value = {"token": "token_cache"}
         mock_response.status_code = 200
         mock_request.return_value = mock_response
@@ -79,9 +77,9 @@ class TestIlovepdfAuthManager:
         assert token1 == token2 == "token_cache"
         mock_request.assert_called_once()
 
-    @patch("requests.request")
-    def test_invalid_credentials_raise_exception(self, mock_request):
-        mock_response = MagicMock()
+    def test_invalid_credentials_raise_exception(self, mocker: MockerFixture):
+        mock_request = mocker.patch("requests.request")
+        mock_response = mocker.MagicMock()
         mock_response.status_code = 401
         mock_response.json.return_value = {
             "error": {
@@ -96,8 +94,8 @@ class TestIlovepdfAuthManager:
         with pytest.raises(AuthException):
             manager.get_token()
 
-    @patch("requests.request")
-    def test_connection_error_raises_exception(self, mock_request):
+    def test_connection_error_raises_exception(self, mocker: MockerFixture):
+        mock_request = mocker.patch("requests.request")
         mock_request.side_effect = Exception("Connection error")
         manager = IlovepdfAuthManager(public_key="public", secret_key="secret")
         with pytest.raises(Exception) as excinfo:

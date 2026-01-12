@@ -1,68 +1,150 @@
-"""Unit tests for the File class in the ilovepdf module."""
+"""
+Unit tests for BaseFile and File classes from ilovepdf.file.
 
-import unittest
-from unittest.mock import Mock
+These tests cover:
+- Initialization and default values
+- Property setters and validation
+- Error handling for invalid input
+- Required fields enforcement
 
-from ilovepdf import File
+All tests use pytest and custom abstract test bases for consistency.
+"""
+
+import pytest
+
+from ilovepdf.file import BaseFile, File
+
+from .base_test import AbstractBaseFileTest, AbstractUnitFileTest
 
 
-class TestFile(unittest.TestCase):
-    """Unit tests for the File class in the ilovepdf module."""
+# pylint: disable=protected-access
+class TestBaseFile(AbstractBaseFileTest):
+    """
+    Unit tests for the BaseFile class.
 
-    def setUp(self):
-        self.file = File("server_filename", "filename")
+    Covers initialization, default values, property validation, and error handling.
+    """
 
-    def test_initialization(self):
-        self.assertEqual(self.file.server_filename, "server_filename")
-        self.assertEqual(self.file.filename, "filename")
+    _task_class = BaseFile
 
-        with self.assertRaises(ValueError):
-            File("", "filename")
-        with self.assertRaises(ValueError):
-            File("server_filename", "")
+    @pytest.mark.parametrize(
+        "server_filename, filename",
+        [
+            ("any_server_filename", "any_filename"),
+            ("some_server_filename", "some_filename"),
+        ],
+    )
+    def test_initialization_and_payload(self, server_filename, filename):
+        """
+        Test initialization and payload content for various input values.
 
-    def test_set_rotation(self):
-        self.file.set_rotation(90)
-        self.assertEqual(self.file.rotate, 90)
+        Asserts that attributes and payload are set correctly.
+        """
+        file = self._task_class(server_filename, filename)
+        assert file.server_filename == server_filename
+        assert file.filename == filename
+        assert file._to_payload() == {
+            "server_filename": server_filename,
+            "filename": filename,
+        }
 
-        with self.assertRaises(ValueError):
-            self.file.set_rotation(45)
+    def test_initialization_sets_default_values(
+        self, my_task
+    ):  # pylint: disable=unused-argument
+        """
+        Test that BaseFile._DEFAULT_PAYLOAD contains expected default values.
+        """
+        assert BaseFile._DEFAULT_PAYLOAD == {
+            "server_filename": None,
+            "filename": None,
+        }
 
-    def test_set_password(self):
-        self.file.set_password("password")
-        self.assertEqual(self.file.password, "password")
+    def test_set_filename(self, my_task):
+        """
+        Test setting the filename property with a valid string.
+        """
+        my_task.filename = "filename"
+        assert my_task.filename == "filename"
 
-    def test_get_file_options(self):
-        options = self.file.get_file_options()
-        self.assertEqual(options["server_filename"], "server_filename")
-        self.assertEqual(options["filename"], "filename")
+    def test_set_filename_invalid(self, my_task):
+        """
+        Test that invalid values for filename raise ValueError or TypeError.
+        """
+        with pytest.raises(ValueError):
+            my_task.filename = ""
+        with pytest.raises(TypeError):
+            my_task.filename = None
+        with pytest.raises(TypeError):
+            my_task.filename = 1234
 
-    def test_get_sanitized_pdf_pages(self):
-        self.file.pdf_pages = ["100x200", "300x400"]
-        sanitized = self.file.get_sanitized_pdf_pages()
-        self.assertEqual(
-            sanitized,
-            [{"width": "100", "height": "200"}, {"width": "300", "height": "400"}],
+    def test_set_server_filename(self, my_task):
+        """
+        Test setting the server_filename property with a valid string.
+        """
+        my_task.server_filename = "server_filename"
+        assert my_task.server_filename == "server_filename"
+
+    def test_set_server_filename_invalid(self, my_task):
+        """
+        Test that invalid values for server_filename raise ValueError or TypeError.
+        """
+        with pytest.raises(ValueError):
+            my_task.server_filename = ""
+        with pytest.raises(TypeError):
+            my_task.server_filename = None
+        with pytest.raises(TypeError):
+            my_task.server_filename = 1234
+
+    def test_missing_required_fields_raises(self, my_task):
+        """
+        Test that MissingPayloadFieldError is raised when required fields are missing.
+        """
+        self.assert_missing_required_fields_raise(
+            my_task, ["server_filename", "filename"]
         )
 
-    def test_each_pdf_form_element(self):
-        self.file.pdf_forms = [
-            {"page": 1, "type": "text", "value": "test"},
-            {"page": 2, "type": "signature"},
-        ]
-        self.file.pdf_pages = ["100x200", "300x400"]
 
-        mock_callback = Mock()
-        self.file.each_pdf_form_element(mock_callback)
+class TestFile(AbstractUnitFileTest, TestBaseFile):
+    """
+    Unit tests for the File class.
 
-        self.assertEqual(mock_callback.call_count, 2)
-        mock_callback.assert_any_call(
-            self.file.pdf_forms[0], {"width": "100", "height": "200"}
-        )
-        mock_callback.assert_any_call(
-            self.file.pdf_forms[1], {"width": "300", "height": "400"}
-        )
+    Covers initialization, property validation, and error handling for File.
+    """
 
+    _task_class = File
 
-if __name__ == "__main__":
-    unittest.main()
+    def test_initialization_sets_default_values(self, my_task):
+        """
+        Test that File._DEFAULT_PAYLOAD contains expected default values.
+        """
+        assert my_task._DEFAULT_PAYLOAD == {
+            "server_filename": None,
+            "filename": None,
+            "pdf_pages": None,
+            "pdf_page_number": None,
+            "pdf_forms": None,
+        }
+
+    @pytest.mark.parametrize(
+        "server_filename, filename",
+        [
+            ("any_server_filename", "any_filename"),
+            ("some_server_filename", "some_filename"),
+        ],
+    )
+    def test_initialization_and_payload(self, server_filename, filename):
+        """
+        Test initialization and payload content for various input values.
+
+        Asserts that attributes and payload are set correctly.
+        """
+        file = self._task_class(server_filename, filename)
+        assert file.server_filename == server_filename
+        assert file.filename == filename
+        assert file._to_payload() == {
+            "server_filename": server_filename,
+            "filename": filename,
+            "pdf_pages": None,
+            "pdf_page_number": None,
+            "pdf_forms": None,
+        }
