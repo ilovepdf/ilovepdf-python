@@ -1,4 +1,7 @@
-"""This script demonstrates how to use the ilovepdf WatermarkTask to add a text watermark to a PDF file."""
+"""
+This script demonstrates how to use the ilovepdf WatermarkTask to add a
+text watermark to a PDF file.
+"""
 
 from ilovepdf import WatermarkTask
 
@@ -51,10 +54,11 @@ my_task.layer = "below"
 
 # and set name for output file.
 # the task will set the correct file extension for you.
-my_task.set_output_filename("document_watermarked.pdf")
+# Set output filename for advanced watermark result
+my_task.set_output_filename("watermark_advanced_result.pdf")
 
 # process files
 my_task.execute()
 
-# and finally download the unlocked file. If no path is set, it will be downloaded on current folder
-my_task.download()
+# Download the unlocked file to the output folder
+my_task.download("output_folder")

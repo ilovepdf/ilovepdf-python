@@ -1,29 +1,27 @@
-"""Sample script for advanced PDF split using iLovePDF Python SDK.
+"""Advanced PDF split example using iLovePDF Python SDK.
 
-Demonstrates splitting a PDF into custom ranges and setting output filenames.
+Demonstrates splitting a PDF into custom page ranges, and setting output filename.
+API supports using properties instead of set_XXX methods. For more advanced options,
+see SplitTask docstring and https://developer.ilovepdf.com/docs/api-reference/split-pdf
 """
 
 from ilovepdf import SplitTask
 
-# You can call the task class directly
-# To get your key pair, please visit https://developer.ilovepdf.com/user/projects
+# Initialize split task (get your keys at https://developer.ilovepdf.com/user/projects)
 my_task = SplitTask("project_public_id", "project_secret_key")
 
-# File variable keeps info about server file id, name, etc.
-# It can be used later to cancel file
+# Add the PDF file
 file = my_task.add_file("/path/to/file/document.pdf")
 
-# Set ranges to split the document
-my_task.set_ranges("2-4,6-8")
+# Split the document into multiple parts based on defined page ranges
+my_task.ranges = "2-4,6-8"  # Each range will export as a separate document
 
-# Set name for output zip file (package)
-my_task.set_packaged_filename("split_documents")
-
-# Set name for splitted document (inside the zip file)
-my_task.set_output_filename("split")
+# (Optional) Set name for each splitted PDF inside the zip (otherwise server names them)
+# Set output filename for advanced split result (ZIP)
+my_task.set_output_filename("split_advanced_result.zip")
 
 # Process files
 my_task.execute()
 
-# And finally download file. If no path is set, it will be downloaded in the current folder
-my_task.download("path/to/download")
+# Download the zip to the output folder
+my_task.download("output_folder")

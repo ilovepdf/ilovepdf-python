@@ -20,10 +20,10 @@ my_task.conformance = "pdfa-2b"  # PDF/A conformance level
 # Process the task (convert PDFs to PDF/A)
 my_task.execute()
 
-# Optional
-# Set the output filename for the resulting file
-# If multiple files are added, the result will be a ZIP
+# Optional: set the output filename for the resulting file.
+# If multiple files are added, the result will be a ZIP.
 my_task.set_output_filename("documents_pdfa.zip")
 
-# Download the converted file. It will be saved as 'documents_pdfa.zip' in the current folder
-my_task.download()
+# Download the converted file.
+# It will be saved as 'documents_pdfa.zip' in the current folder
+my_task.download("output_folder")

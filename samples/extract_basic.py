@@ -13,7 +13,7 @@ my_task.add_file("/path/to/document1.pdf")
 
 # Optional: configure extraction parameters
 # Set detailed to True to include extra PDF properties in the extracted text
-my_task.detailed = True  # Default is False
+my_task.detailed = True
 
 # Process the task (extract text from PDF)
 my_task.execute()
@@ -21,5 +21,8 @@ my_task.execute()
 # Optional: set the output filename for the resulting text file
 my_task.set_output_filename("extracted_text.txt")
 
-# Download the extracted text file. It will be saved as 'extracted_text.txt' in the current folder
-my_task.download()
+# Set output filename for extracted text
+my_task.set_output_filename("extract_basic_result.txt")
+
+# Download the extracted text file to a folder
+my_task.download("output_folder")

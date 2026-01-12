@@ -1,17 +1,25 @@
-"""This module demonstrates how to merge PDF files using the ilovepdf Python SDK."""
+"""This module demonstrates how to merge PDF files using the ilovepdf Python SDK.
+
+MergeTask allows you to combine multiple PDFs into a single file. Simply initialize,
+add files, execute, and download.
+
+https://developer.ilovepdf.com/docs/api-reference/merge-pdf
+"""
 
 from ilovepdf import MergeTask
 
 # Initialize the merge task with your project keys
-task = MergeTask("project_public_id", "project_secret_key")
+my_task = MergeTask("project_public_id", "project_secret_key")
 
-# Upload files to be merged
-task.add_file("/path/to/file/document-1.pdf")
-task.add_file("/path/to/file/document-2.pdf")
+# Add each PDF to be merged
+my_task.add_file("/path/to/file/document-1.pdf")
+my_task.add_file("/path/to/file/document-2.pdf")
 
+# Execute the merge task
+my_task.execute()
 
-# Execute the merge task and get the result
-task.execute()
+# Set output filename for merged PDF
+my_task.set_output_filename("merge_basic_result.pdf")
 
-# Finally, download the merged file. It will be saved as 'merged.pdf' in the current folder
-task.download()
+# Download the merged file (to a folder)
+my_task.download("output_folder")

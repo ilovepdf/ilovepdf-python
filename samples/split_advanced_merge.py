@@ -1,29 +1,31 @@
 """Sample script for advanced split and merge using iLovePDF API.
 
-Demonstrates how to split a PDF into ranges and merge the results into a single document.
+Demonstrates how to split a PDF into custom ranges and merge the results
+into a single document using SplitTask properties.
+
+For details, see: https://developer.ilovepdf.com/docs/api-reference/split-pdf
 """
 
 from ilovepdf import SplitTask
 
-# You can use the task class directly
-# To get your key pair, please visit https://developer.ilovepdf.com/user/projects
+# Initialize split task (use your project keys from ilovepdf.com/user/projects)
 my_task = SplitTask("project_public_id", "project_secret_key")
 
-# File variable keeps info about server file id, name, etc.
-# It can be used later to cancel file
+# Add the PDF file
 file = my_task.add_file("/path/to/file/document.pdf")
 
-# Set ranges to split the document
-my_task.set_ranges("2-4,6-8")
+# Split the PDF into ranges
+my_task.ranges = "2-4,6-8"  # Each part becomes a separate file
 
-# Set that we want splitted files to be merged into a new one
-my_task.set_merge_after(True)
+# Set that we want the splitted files to be merged into a single document
+my_task.merge_after = True
 
-# Set name for merged document
-my_task.set_output_filename("split")
+# Set name for the output file (the merged result)
+# Set output filename for advanced split-merge result
+my_task.set_output_filename("split_advanced_merge_result.pdf")
 
-# Process files
+# Process
 my_task.execute()
 
-# And finally download file. If no path is set, it will be downloaded in the current folder
-my_task.download("path/to/download")
+# Download the output to the output folder
+my_task.download("output_folder")

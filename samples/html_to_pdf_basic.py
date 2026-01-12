@@ -1,9 +1,9 @@
 """
 Sample usage of HtmlToPdfTask for converting HTML content to PDF.
 
-This example demonstrates how to use the HtmlToPdfTask class to convert HTML files or URLs to PDF
-using the iLovePDF API. You can configure options such as page orientation, margin, view width,
-page size, single page mode, ad blocking, and popup removal.
+This example demonstrates how to use the HtmlToPdfTask class to convert HTML files or
+URLs to PDF using the iLovePDF API. You can configure options such as page orientation,
+margin, view width, page size, single page mode, ad blocking, and popup removal.
 
 To get your key pair, please visit: https://developer.ilovepdf.com/user/projects
 
@@ -21,7 +21,6 @@ from ilovepdf import HtmlToPdfTask
 
 # Create the task instance with your public and secret keys
 my_task = HtmlToPdfTask("project_public_id", "project_secret_key")
-
 
 # Add HTML file to be converted to PDF
 # You can add a local HTML file or a remote HTML file via URL
@@ -43,5 +42,11 @@ my_task.execute()
 # Optional: set the output filename for the resulting PDF
 my_task.set_output_filename("converted_html.pdf")
 
-# Download the PDF file. It will be saved as 'converted_html.pdf' in the current folder
-my_task.download()
+# Set output filename for HTML-to-PDF result
+my_task.set_output_filename("html_to_pdf_basic_result.pdf")
+
+# Set output filename for HTML-to-PDF result
+my_task.set_output_filename("html_to_pdf_basic_result.pdf")
+
+# Download the HTML-to-PDF file to a folder
+my_task.download("output_folder")

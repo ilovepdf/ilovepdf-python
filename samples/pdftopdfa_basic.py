@@ -1,8 +1,8 @@
 """
 Module for converting PDF files to PDF/A format using ilovepdf's PdfToPdfATask.
 
-Sample usage of PdfToPdfATask for converting PDF files to PDF/A format.
-To get your key pair, please visit https://developer.ilovepdf.com/user/projects
+Sample usage of PdfToPdfATask for converting PDF files to PDF/A format. To get your key
+pair, please visit https://developer.ilovepdf.com/user/projects
 """
 
 from ilovepdf import PdfToPdfATask
@@ -24,5 +24,8 @@ my_task.execute()
 # Set the output filename for the resulting file
 my_task.set_output_filename("documents_pdfa.pdf")
 
-# Download the converted file. It will be saved as 'documents_pdfa.pdf' in the current folder
-my_task.download()
+# Set output filename for PDF/A result
+my_task.set_output_filename("pdftopdfa_basic_result.pdf")
+
+# Download the PDF/A result to a folder
+my_task.download("output_folder")
