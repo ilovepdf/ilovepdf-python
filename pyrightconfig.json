@@ -1,0 +1,18 @@
+{
+  // "typeCheckingMode": "strict",
+  "pythonVersion": "3.10",
+  "pythonPlatform": "Linux",
+  "reportDeprecated": true,
+  "include": ["ilovepdf", "tests", "samples"],
+  "exclude": [
+    "**/venv",
+    "**/.venv",
+    "**/env",
+    "**/.env",
+    "**/build",
+    "**/dist",
+    "**/.mypy_cache",
+    "**/.pytest_cache",
+    "**/.tox",
+  ],
+}

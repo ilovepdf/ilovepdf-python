@@ -1,38 +1,55 @@
 x-python-base: &python_base
-    tty: true
-    env_file:
-        - ../.env
+  tty: true
+  env_file:
+    - ../.env
 
 services:
-    python39:
-        <<: *python_base
-        image: ilovepdf-python39
-        container_name: ilovepdf-python39
+  python310:
+    <<: *python_base
+    image: ilovepdf-python310
+    build:
+      context: ../
+      dockerfile: .docker/Dockerfile
+      args:
+        PYTHON_VERSION: "3.10"
+    container_name: ilovepdf-python310
 
-    # python310:
-    #   <<: *python_base
-    #   build:
-    #     args:
-    #       PYTHON_VERSION: "3.10"
-    #   container_name: ilovepdf-python310
+  python311:
+    <<: *python_base
+    image: ilovepdf-python311
+    build:
+      context: ../
+      dockerfile: .docker/Dockerfile
+      args:
+        PYTHON_VERSION: "3.11"
+    container_name: ilovepdf-python311
 
-    # python311:
-    #   <<: *python_base
-    #   build:
-    #     args:
-    #       PYTHON_VERSION: "3.11"
-    #   container_name: ilovepdf-python311
+  python312:
+    <<: *python_base
+    image: ilovepdf-python312
+    build:
+      context: ../
+      dockerfile: .docker/Dockerfile
+      args:
+        PYTHON_VERSION: "3.12"
+    container_name: ilovepdf-python312
 
-    # python312:
-    #   <<: *python_base
-    #   build:
-    #     args:
-    #       PYTHON_VERSION: "3.12"
-    #   container_name: ilovepdf-python312
+  python313:
+    <<: *python_base
+    image: ilovepdf-python313
+    build:
+      context: ../
+      dockerfile: .docker/Dockerfile
+      args:
+        PYTHON_VERSION: "3.13"
+    container_name: ilovepdf-python313
 
-    # python313:
-    #   <<: *python_base
-    #   build:
-    #     args:
-    #       PYTHON_VERSION: "3.13"
-    #   container_name: ilovepdf-python313
+  python314:
+    <<: *python_base
+    image: ilovepdf-python314
+    build:
+      context: ../
+      dockerfile: .docker/Dockerfile
+      args:
+        PYTHON_VERSION: "3.14"
+    container_name: ilovepdf-python314

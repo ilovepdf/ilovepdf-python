@@ -1,8 +1,0 @@
-{
-    "languages": {
-        "Python": {
-            "language_servers": ["pyright", "ruff"]
-        }
-    },
-    "autosave": "on_focus_change"
-}

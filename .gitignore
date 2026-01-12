@@ -7,3 +7,11 @@ venv
 .pytest_cache
 .ropeproject
 .egg-info
+*.bak
+.zed
+*.sublime-*
+.localrc
+outfiles/
+AGENTS.md
+.rules
+output_live

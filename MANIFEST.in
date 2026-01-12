@@ -1,0 +1,44 @@
+# MANIFEST.in
+# Controls which files are included in the distribution package (wheel/sdist)
+# when users install via: pip install ilovepdf
+
+# Include documentation files
+include README.md
+include LICENSE
+include CHANGELOG.md
+include CONTRIBUTING.md
+include CODE_OF_CONDUCT.md
+
+# Include requirements files
+include requirements.txt
+
+# Include example scripts for users
+graft samples
+prune samples/__pycache__
+
+# Exclude development and build artifacts
+global-exclude __pycache__
+global-exclude *.py[co]
+global-exclude .DS_Store
+global-exclude *.so
+global-exclude .git*
+global-exclude .coverage
+global-exclude .pytest_cache
+
+# Exclude development-only files and directories
+prune tests
+prune .docker
+prune .gitea
+exclude AGENTS.md
+exclude requirements_test.txt
+exclude requirements_dev.txt
+exclude .dockerignore
+exclude pytest.ini
+
+# Exclude editor and IDE files
+global-exclude .vscode
+global-exclude .idea
+global-exclude .zed
+global-exclude *.swp
+global-exclude *.swo
+global-exclude *~

@@ -2,3 +2,5 @@
 pytest>=7.0.0
 pytest-cov>=4.0.0
 pytest-rerunfailures
+pytest_mock
+pytest-timeout>=2.1.0

@@ -6,8 +6,21 @@ authors = [{ name = "ilovepdf", email = "info@ilovepdf.com" }]
 license = { file = "LICENSE" }
 readme = "README.md"
 
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 dependencies = ["requests>=2.28.0", "pyjwt>=2.4.0"]
+
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Programming Language :: Python :: 3 :: Only",
+]
 
 [project.urls]
 Documentation = "https://developer.ilovepdf.com/docs"
@@ -20,12 +33,30 @@ where = ["."]
 requires = ["setuptools>=61.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
+[tool.black]
+line-length = 88
+target-version = ["py310", "py311", "py312", "py313", "py314"]
+skip-string-normalization = false
+extend-exclude = "samples/"
+
+[tool.isort]
+profile = "black"
+line_length = 88
+py_version = 310
+combine_as_imports = true
+include_trailing_comma = true
+force_grid_wrap = 0
+skip_glob = ["samples/*"]
+
+known_first_party = ["ilovepdf"]
+
 [tool.flake8]
-exclude = ".git,future,venv"
-max-line-length = 119
+exclude = ".git,future,venv,samples"
+max-line-length = 88
+extend-ignore = ["E203"]
 
 [tool.pylint.format]
-max-line-length = 119
+max-line-length = 88
 
 [tool.pylint."MESSAGES CONTROL"]
 disable = ["C0116"]
