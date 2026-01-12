@@ -1,78 +1,53 @@
 # Integration Tests
 
-This directory contains integration tests for the iLovePDF Python library.
+This folder contains integration tests for the iLovePDF Python library. Integration tests are designed to verify the correct interaction between the library and the iLovePDF API, as well as to validate end-to-end workflows involving real API calls and file operations.
 
-Integration tests validate the interaction between modules and the iLovePDF API, ensuring workflows and external communications function as expected.
+## Structure
 
-**Note:** Integration tests require internet access and valid iLovePDF API credentials.
+- Each test file targets a specific feature or workflow (e.g., PDF compression, merging, conversion, OCR).
+- Tests may require valid API credentials and sample PDF/image files.
 
-For general requirements, project structure, and usage examples, see [tests/README.md](../README.md).
+## Running Integration Tests
 
----
+1. Ensure you have a valid `.env` file in the `.docker/` directory with the following variables set:
+   - `ILOVEPDF_PUBLIC_KEY`
+   - `ILOVEPDF_SECRET_KEY`
+   - `FOLDER_SAMPLE_PATH` (default: `tests/integration/files_samples`)
 
-## Test Files Summary
-
-**Note:** The `files_samples` directory contains input files (PDFs, images, etc.) used for automated tests.
-For usage examples and scripts, see the [samples](../../samples/README.md) folder in the project root.
-
-**Example input file:**
-A typical input file for integration tests might be `sample.pdf` (PDF format) placed in `integration/files_samples/`.
-Make sure your test scripts reference the correct file name and path.
-
-| File Name                           | Description                                                                                   |
-|--------------------------------------|----------------------------------------------------------------------------------------------|
-| test_00_auth_integration.py          | Tests authentication, credential configuration, token retrieval, and error handling.          |
-| test_01_upload_files_integration.py  | Tests file upload flow, large PDF upload, and download verification.                         |
-| test_compress_task_integration.py    | Tests CompressTask integration, compression levels, error handling, and compress-download workflow. |
-| test_protect_task_integration.py     | Tests ProtectTask integration, password setting, execution, and protected PDF download.       |
-| test_sign_basic_task_integration.py  | Tests SignTask integration, signature creation, signer assignment, execution, and result validation. |
-| test_split_task_integration.py       | Tests SplitTask integration, splitting by ranges, fixed range, page removal, and max filesize per part. |
-| test_unlock_task_integration.py      | Tests UnlockTask integration, password-protected file handling, execution, and unlocked PDF download. |
-| test_merge_task_integration.py       | Tests MergeTask integration, multiple PDF merging, execution, and merged PDF download.        |
-| test_rotate_task_integration.py      | Tests RotateTask integration, rotation settings, execution, and rotated PDF download.         |
-| test_office_pdf_task_integration.py  | Tests OfficePdfTask integration, Office file conversion, execution, and PDF download.         |
-| test_pdfocr_task_integration.py      | Tests PdfOcrTask integration, OCR language settings, scanned PDF handling, execution, and result download. |
-| test_repair_task_integration.py      | Tests RepairTask integration, corrupted PDF handling, execution, and repaired PDF download.   |
-| test_imagepdf_task_integration.py    | Tests ImagePdfTask integration, image-to-PDF conversion using the API.                       |
-| test_pdf_to_pdfa_task_integration.py | Tests PdfToPdfATask integration, PDF/A conformance, downgrade options, execution, and PDF/A download. |
-| test_extract_task_integration.py     | Tests ExtractTask integration, extraction parameters, execution, and extracted text download. |
-
-_Add new entries to the table above as more integration tests are added._
-
----
-
-## How to Run Integration Tests
-
-Before running the tests, set the following environment variables with your credentials and sample files path.
-
-**Note:**
-Set the environment variable `FOLDER_SAMPLE_PATH` to `"tests/integration/files_samples"` as the default value, regardless of your working directory.
-This ensures consistency and avoids confusion.
+2. Run the tests using your preferred test runner (e.g., `pytest`):
 
 ```bash
-export ILOVEPDF_PUBLIC_KEY="your_project_public_key"
-export ILOVEPDF_SECRET_KEY="your_project_secret_key"
-export FOLDER_SAMPLE_PATH="tests/integration/files_samples"
 pytest tests/integration
 ```
 
----
+## Test Files
 
-## Contributing
+| File Name                                   | Description                                                                                  |
+|---------------------------------------------|----------------------------------------------------------------------------------------------|
+| test_integration_00_auth.py                 | Integration tests for authentication and API key validation.                                 |
+| test_integration_01_upload_files.py         | Integration tests for uploading files to the API.                                            |
+| test_integration_compress_task.py           | Integration tests for CompressTask, covering full workflow: adding files, setting compression parameters, executing, and downloading results. |
+| test_integration_extract_task.py            | Integration tests for ExtractTask, covering extraction of text or images from PDFs.           |
+| test_integration_htmltopdf_task.py          | Integration tests for HtmlToPdfTask, converting HTML to PDF and validating options.           |
+| test_integration_imagepdf_task.py           | Integration tests for ImagePdfTask, converting images to PDF and merging.                     |
+| test_integration_merge_task.py              | Integration tests for MergeTask, merging multiple PDF files.                                  |
+| test_integration_office_pdf_task.py         | Integration tests for OfficePdfTask, converting Office files to PDF.                          |
+| test_integration_pdfocr_task.py             | Integration tests for PdfOcrTask, performing OCR on scanned PDFs.                             |
+| test_integration_pdftopdfa_task.py          | Integration tests for PdfToPdfATask, converting PDFs to PDF/A format.                         |
+| test_integration_protect_task.py            | Integration tests for ProtectTask, adding password protection to PDFs.                        |
+| test_integration_repair_task.py             | Integration tests for RepairTask, repairing corrupted PDFs.                                   |
+| test_integration_rotate_task.py             | Integration tests for RotateTask, rotating PDF pages.                                         |
+| test_integration_sign_basic_task.py         | Integration tests for SignTask, digital signature workflows.                                  |
+| test_integration_split_task.py              | Integration tests for SplitTask, splitting PDFs by range, pages, or size.                     |
+| test_integration_unlock_task.py             | Integration tests for UnlockTask, removing password protection from PDFs.                     |
+| test_integration_watermark_task.py          | Integration tests for WatermarkTask, adding text or image watermarks to PDFs.                 |
+| test_integration_removebackground_task.py   | Integration tests for RemoveBackgroundTask, verifying background removal in PDFs.             |
+| test_integration_resize_task.py             | Integration tests for ResizeTask, resizing images within PDFs.                                |
+| test_integration_upscale_task.py            | Integration tests for UpscaleTask, AI-based upscaling of images in PDFs.                      |
 
-- Place new integration test files in this directory.
-- Add a brief description to the summary table above.
-- Use sample files from `files_samples` and valid API credentials.
-- Follow project conventions for naming and documentation.
-- Update this README to reflect new tests and instructions.
+Update this table as new integration tests are added.
 
----
+## Notes
 
-## Links
-
-- [Main README](../../README.md)
-- [Unit Tests README](../unit/README.md)
-- [Samples README](../../samples/README.md)
-- [Official iLovePDF API Documentation](https://developer.ilovepdf.com/docs)
-
----
+- Integration tests may consume API quota and require internet access.
+- Sensitive data such as API keys should never be committed to the repository.

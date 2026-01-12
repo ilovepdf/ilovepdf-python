@@ -4,14 +4,12 @@ Covers:
 - Full workflow: add Office file, execute conversion, and download resulting PDF.
 """
 
-import unittest
-
 from ilovepdf import OfficePdfTask
 
-from .utils.base_ilovepdf_task_test import BaseIlovePdfTaskTest
+from .base_task_integration_test import BaseTaskIntegrationTest
 
 
-class TestOfficePdfTaskIntegration(BaseIlovePdfTaskTest):
+class TestOfficePdfTaskIntegration(BaseTaskIntegrationTest):
     """
     Integration tests for OfficePdfTask using the iLovePDF API.
 
@@ -20,22 +18,16 @@ class TestOfficePdfTaskIntegration(BaseIlovePdfTaskTest):
     """
 
     task_class = OfficePdfTask
-    sample_file_path = "sample_word.docx"
 
     def test_full_office_to_pdf_flow(self):
         """
         Test the full flow: add Office file, execute conversion, and download PDF.
         """
         # Add the Office file to the task
-        self.add_sample_file()
+        self.add_sample_file("sample_word.docx")
 
         # Execute the conversion task and check status
         self.execute_task()
 
         # Download the converted PDF and verify
-        output_file = "converted_sample.pdf"
-        self.download_result(output_file)
-
-
-if __name__ == "__main__":
-    unittest.main()
+        self.download_result("converted_sample.pdf")

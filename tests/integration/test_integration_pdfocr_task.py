@@ -7,14 +7,12 @@ This test covers the full OCR workflow:
 - Downloading and verifying the output file
 """
 
-import unittest
-
 from ilovepdf import PdfOcrTask
 
-from .utils.base_ilovepdf_task_test import BaseIlovePdfTaskTest
+from .base_task_integration_test import BaseTaskIntegrationTest
 
 
-class TestPdfOcrTaskIntegration(BaseIlovePdfTaskTest):
+class TestPdfOcrTaskIntegration(BaseTaskIntegrationTest):
     """
     Integration test for PdfOcrTask using the iLovePDF API.
 
@@ -32,23 +30,14 @@ class TestPdfOcrTaskIntegration(BaseIlovePdfTaskTest):
         """
         Test the full flow: set languages, add file, process, and download OCR result.
         """
-
         # Add the sample file to the task
         file_sample = self.add_sample_file()
-        # file_sample.set_languages(["spa", "eng"])
-        print("file_sample>>>>>>>>>>>>>>>>>>>>>>>", file_sample.get_file_options())
-        print("file_sample>>>>>>>>>>>>>>>>>>>>>>>", type(file_sample))
-        # raise Exception("Test failed")
 
         # Set OCR languages
-        # file_sample.set_languages(["spa", "eng"] )
+        file_sample.ocr_languages = ["spa", "eng"]
 
         # Execute the task and check status
         self.execute_task()
 
-        # Download the protected file and verify
-        self.download_result("document_ocr.pdf")
-
-
-if __name__ == "__main__":
-    unittest.main()
+        # Download the OCR result
+        self.download_result("pdf_sample_scanned_ocr.pdf")
