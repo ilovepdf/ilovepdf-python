@@ -1,0 +1,17 @@
+name: Installation Validation
+
+on:
+  push:
+    tags:
+      - "install-*"
+
+jobs:
+  installation:
+    name: Installation Validation
+    strategy:
+      fail-fast: true
+      matrix:
+        python-version: ["3.10", "3.14"]
+    uses: ./.gitea/workflows/jobs/installation.yml
+    with:
+      python-version: ${{ matrix.python-version }}

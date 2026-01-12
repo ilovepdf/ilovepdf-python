@@ -1,0 +1,72 @@
+name: Full Validation
+
+on:
+  push:
+    tags:
+      - "full-*"
+
+jobs:
+  lint:
+    name: Lint
+    uses: ./.gitea/workflows/jobs/lint.yml
+    with:
+      python-version: "3.10"
+
+  unit_test:
+    name: Unit Tests
+    needs: lint
+    strategy:
+      fail-fast: true
+      matrix:
+        python-version: ["3.10", "3.14"]
+    uses: ./.gitea/workflows/jobs/unit-test.yml
+    with:
+      python-version: ${{ matrix.python-version }}
+
+  installation:
+    name: Installation Validation
+    needs: unit_test
+    strategy:
+      fail-fast: true
+      matrix:
+        python-version: ["3.10", "3.14"]
+    uses: ./.gitea/workflows/jobs/installation.yml
+    with:
+      python-version: ${{ matrix.python-version }}
+
+  validate_secrets:
+    name: Validate API Keys
+    needs: installation
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/catthehacker/ubuntu:act-latest
+    outputs:
+      secrets_available: ${{ steps.check.outputs.available }}
+    steps:
+      - name: Check if secrets are set
+        id: check
+        run: |
+          if [ -n "${{ secrets.ILOVEPDF_PUBLIC_KEY }}" ] && [ -n "${{ secrets.ILOVEPDF_SECRET_KEY }}" ]; then
+            echo "available=true" >> $GITHUB_OUTPUT
+            echo "✓ API keys are configured"
+          else
+            echo "available=false" >> $GITHUB_OUTPUT
+            echo "✗ API keys are missing"
+            echo "Please configure ILOVEPDF_PUBLIC_KEY and ILOVEPDF_SECRET_KEY in repository secrets"
+            exit 1
+          fi
+
+  integration_test:
+    name: Integration Tests
+    needs: validate_secrets
+    if: needs.validate_secrets.outputs.secrets_available == 'true'
+    strategy:
+      fail-fast: true
+      matrix:
+        python-version: ["3.10", "3.14"]
+    uses: ./.gitea/workflows/jobs/integration-test.yml
+    with:
+      python-version: ${{ matrix.python-version }}
+    secrets:
+      ILOVEPDF_PUBLIC_KEY: ${{ secrets.ILOVEPDF_PUBLIC_KEY }}
+      ILOVEPDF_SECRET_KEY: ${{ secrets.ILOVEPDF_SECRET_KEY }}

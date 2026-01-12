@@ -1,0 +1,46 @@
+name: Quick CI
+
+on:
+  push:
+    branches:
+      - "**"
+    tags-ignore:
+      - "**"
+    paths:
+      - "ilovepdf/**/*.py"
+      - "tests/**/*.py"
+      - "samples/**/*.py"
+      - "*.py"
+      - "pyproject.toml"
+      - "setup.py"
+      - "setup.cfg"
+      - "requirements*.txt"
+  pull_request:
+    paths:
+      - "ilovepdf/**/*.py"
+      - "tests/**/*.py"
+      - "samples/**/*.py"
+      - "*.py"
+      - "pyproject.toml"
+      - "setup.py"
+      - "setup.cfg"
+      - "requirements*.txt"
+  workflow_dispatch:
+
+jobs:
+  lint:
+    name: Lint
+    uses: ./.gitea/workflows/jobs/lint.yml
+    with:
+      python-version: "3.10"
+
+  unit_test:
+    name: Unit Tests
+    needs: lint
+    strategy:
+      fail-fast: true
+      matrix:
+        python-version: ["3.10", "3.14"]
+    uses: ./.gitea/workflows/jobs/unit-test.yml
+    with:
+      python-version: ${{ matrix.python-version }}

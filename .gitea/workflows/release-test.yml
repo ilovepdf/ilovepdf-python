@@ -1,0 +1,42 @@
+name: Release to TestPyPI
+
+on:
+  push:
+    tags:
+      - "v*-alpha*"
+      - "v*-beta*"
+      - "v*-rc*"
+      - "v*-dev*"
+      - "v*-test*"
+  workflow_dispatch:
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/catthehacker/ubuntu:act-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Build and publish
+        env:
+          TWINE_USERNAME: __token__
+          TWINE_PASSWORD: ${{ secrets.TEST_PYPI_TOKEN }}
+        run: |
+          pip install build twine
+          python -m build
+          twine upload --repository testpypi dist/*
+
+      - name: Success
+        run: |
+          echo "✅ Published to TestPyPI"
+          echo ""
+          echo "Install with:"
+          echo "  pip install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple/ ilovepdf"
+          echo ""
+          echo "View at: https://test.pypi.org/project/ilovepdf/"
