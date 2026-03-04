@@ -1,11 +1,5 @@
 -r requirements.txt
-black>=23.1.0;
-flake8>=6.0.0;
-flake8-bugbear
-isort>=5.12.0;
-pre-commit>=3.3.0;
-pylint
-pyright
+pre-commit>=3.3.0
+pyright>=1.1.408
 python-lsp-server
-autopep8
-python-dotenv
+ruff>=0.15.5

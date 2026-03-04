@@ -1,45 +1,22 @@
 repos:
-    - repo: https://github.com/psf/black
-      rev: 25.9.0
-      hooks:
-          - id: black
-            additional_dependencies: [black]
-            language_version: python3
-    - repo: https://github.com/pre-commit/mirrors-pylint
-      rev: v3.0.0a5
-      hooks:
-          - id: pylint
-            additional_dependencies:
-                - pylint
-                - PyJWT
-                - pytest
-                - requests
-            language_version: python3
-            entry: bash -c 'PYTHONPATH=. pylint "$@"' --
-    - repo: https://github.com/PyCQA/isort
-      rev: 6.0.1
-      hooks:
-          - id: isort
-            additional_dependencies: [isort]
-            language_version: python3
-    - repo: https://github.com/pycqa/flake8
-      rev: 7.3.0
-      hooks:
-          - id: flake8
-            additional_dependencies: [flake8]
-            language_version: python3
-    - repo: https://github.com/pre-commit/pre-commit-hooks
-      rev: v6.0.0
-      hooks:
-          - id: trailing-whitespace
-          - id: end-of-file-fixer
-          - id: check-yaml
-          - id: check-added-large-files
-    - repo: https://github.com/PyCQA/bandit
-      rev: 1.8.6
-      hooks:
-          - id: bandit
-            files: ^ilovepdf/
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-added-large-files
+      - id: check-toml
 
-default_language_version:
-    python: python3
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.15.5
+    hooks:
+      - id: ruff
+        args: [--fix]
+      - id: ruff-format
+
+  - repo: https://github.com/RobertCraigie/pyright-python
+    rev: v1.1.408
+    hooks:
+      - id: pyright
+        language: system

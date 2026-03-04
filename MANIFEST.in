@@ -29,11 +29,9 @@ global-exclude .pytest_cache
 prune tests
 prune .docker
 prune .gitea
-exclude AGENTS.md
 exclude requirements_test.txt
 exclude requirements_dev.txt
 exclude .dockerignore
-exclude pytest.ini
 
 # Exclude editor and IDE files
 global-exclude .vscode

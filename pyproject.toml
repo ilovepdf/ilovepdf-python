@@ -3,16 +3,15 @@ name = "ilovepdf"
 description = "iLovePDF Python API"
 version = "0.0.1"
 authors = [{ name = "ilovepdf", email = "info@ilovepdf.com" }]
-license = { file = "LICENSE" }
+license = "MIT"
 readme = "README.md"
 
 requires-python = ">=3.10"
-dependencies = ["requests>=2.28.0", "pyjwt>=2.4.0"]
+dependencies = ["requests>=2.28.0", "pyjwt>=2.4.0", "python-dotenv>=1.0.0"]
 
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",
-    "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
@@ -33,33 +32,35 @@ where = ["."]
 requires = ["setuptools>=61.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
-[tool.black]
+[tool.pytest.ini_options]
+pythonpath = ["ilovepdf"]
+testpaths = ["tests"]
+python_files = ["test_*.py", "*_test.py"]
+addopts = "--color=yes -vv --reruns 1 --reruns-delay 3 --tb=short"
+log_cli = true
+log_cli_level = "INFO"
+
+[tool.ruff]
 line-length = 88
-target-version = ["py310", "py311", "py312", "py313", "py314"]
-skip-string-normalization = false
-extend-exclude = "samples/"
+target-version = "py310"
+extend-exclude = ["samples/"]
 
-[tool.isort]
-profile = "black"
-line_length = 88
-py_version = 310
-combine_as_imports = true
-include_trailing_comma = true
-force_grid_wrap = 0
-skip_glob = ["samples/*"]
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "S", "UP"]
 
-known_first_party = ["ilovepdf"]
 
-[tool.flake8]
-exclude = ".git,future,venv,samples"
-max-line-length = 88
-extend-ignore = ["E203"]
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["S101", "S105" , "S106"]
 
-[tool.pylint.format]
-max-line-length = 88
+[tool.pyright]
+include = ["ilovepdf", "tests", "samples"]
+exclude = [
+    "**/venv", "**/.venv", "**/build", "**/dist",
+    "**/.pytest_cache", "**/__pycache__"
+]
+pythonVersion = "3.10"
+pythonPlatform = "Linux"
+typeCheckingMode = "basic"
+reportDeprecated = true
 
-[tool.pylint."MESSAGES CONTROL"]
-disable = ["C0116"]
-
-[tool.pylint.master]
-ignore = ["samples"]
+reportMissingImports = true
