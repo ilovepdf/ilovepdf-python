@@ -12,7 +12,6 @@ from ilovepdf import SignTask
 from .base_task_integration_test import BaseTaskIntegrationTest
 
 
-# pylint: disable=protected-access
 class TestSignBasicTaskIntegration(BaseTaskIntegrationTest):
     """
     Integration tests for SignTask using the iLovePDF API.
@@ -51,11 +50,11 @@ class TestSignBasicTaskIntegration(BaseTaskIntegrationTest):
         self.execute_task()
 
         # Validate that at least one signer exists
-        assert (
-            len(self.task.signers) > 0
-        ), "No signers were found in the task after execution."
+        assert len(self.task.signers) > 0, (
+            "No signers were found in the task after execution."
+        )
         # Validate that signer has name and email
         assert self.task.signers[0].name == signer.name, "Signer name does not match."
-        assert (
-            self.task.signers[0].email == signer.email
-        ), "Signer email does not match."
+        assert self.task.signers[0].email == signer.email, (
+            "Signer email does not match."
+        )

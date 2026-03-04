@@ -8,8 +8,6 @@ import pytest
 
 from ilovepdf.exceptions import ProcessException
 
-# pylint: disable=protected-access
-
 
 class TestProcessException:
     """Unit tests for ProcessException."""

@@ -13,8 +13,6 @@ from ilovepdf.exceptions import (
 )
 from ilovepdf.validators import IntValidator
 
-# pylint: disable=protected-access
-
 
 class TestIntValidatorType:
     """Tests for IntValidator.validate_type()."""

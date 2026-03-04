@@ -15,8 +15,6 @@ from ilovepdf.exceptions import (
     ZeroIntError,
 )
 
-# pylint: disable=protected-access
-
 
 class TestNotAnIntError:
     """Unit tests for NotAnIntError exception."""

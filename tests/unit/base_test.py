@@ -20,7 +20,6 @@ from ilovepdf.exceptions import MissingPayloadFieldError
 from ilovepdf.file import BaseFile
 
 
-# pylint: disable=protected-access
 class AbstractUnitTaskElementTest(ABC):
     """
     Base class for unit tests of ILovePDF task element classes.

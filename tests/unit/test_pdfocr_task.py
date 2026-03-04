@@ -13,7 +13,6 @@ from ilovepdf.pdfocr_task import OcrFile
 from .base_test import AbstractUnitFileTest, AbstractUnitTaskTest
 
 
-# pylint: disable=protected-access
 class TestOcrFile(AbstractUnitFileTest):
     """Unit tests for OcrFile language configuration behavior."""
 

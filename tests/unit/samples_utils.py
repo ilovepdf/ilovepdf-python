@@ -17,8 +17,6 @@ Example:
 from ilovepdf import File
 from ilovepdf.sign import Element, Signer, SignerFile
 
-# pylint: disable=too-few-public-methods,missing-class-docstring
-
 
 class FileSamples:
     """Reusable sample File objects for testing purposes."""

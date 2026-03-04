@@ -9,8 +9,6 @@ import pytest
 from ilovepdf.exceptions import IntNotInAllowedSetError, InvalidChoiceError
 from ilovepdf.validators import ChoiceValidator
 
-# pylint: disable=protected-access,too-few-public-methods
-
 
 class TestChoiceValidatorBasic:
     """Tests for basic ChoiceValidator.validate() functionality."""

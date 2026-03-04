@@ -14,8 +14,6 @@ from ilovepdf import Task
 from ilovepdf.exceptions import StartException
 from ilovepdf.file import File
 
-# pylint: disable=protected-access
-
 
 class DummyTask(Task):
     """Dummy Task class for testing."""
@@ -155,7 +153,7 @@ class TestTaskUploadFile:
         task = DummyTask("public_key", "secret_key")
 
         with pytest.raises(FileNotFoundError) as excinfo:
-            task.upload_file("task_123", "/nonexistent/file.jpg")
+            task.upload_file("task_123", "/nonexistent/file.pdf")
         assert "does not exist" in str(excinfo.value)
 
     def test_upload_file_with_extra_params(self, mocker: MockerFixture, tmp_path):

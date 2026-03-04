@@ -10,6 +10,7 @@ Example:
 
 import os
 import shutil
+import tempfile
 from pathlib import Path
 from typing import Generic, TypeVar
 
@@ -17,7 +18,9 @@ import pytest
 
 from ilovepdf.task import Task
 
-_OUTPUT_COUNTER_FILE = Path("/tmp/ilovepdf_output_counter.txt")
+_OUTPUT_COUNTER_FILE = Path(
+    os.path.join(tempfile.gettempdir(), "ilovepdf_output_counter.txt")
+)
 
 
 def get_and_increment_global_counter() -> int:
@@ -45,7 +48,6 @@ def get_and_increment_global_counter() -> int:
 T = TypeVar("T", bound=Task)
 
 
-# pylint: disable=protected-access
 class BaseTaskIntegrationTest(Generic[T]):
     """
     Base class for iLovePDF Task integration tests.
@@ -245,9 +247,9 @@ class BaseTaskIntegrationTest(Generic[T]):
         self.task.download()
         self.downloaded_file = output_filename
 
-        assert os.path.exists(
-            self.downloaded_file
-        ), f"Downloaded file '{self.downloaded_file}' does not exist."
-        assert (
-            os.path.getsize(self.downloaded_file) > 0
-        ), f"Downloaded file '{self.downloaded_file}' is empty."
+        assert os.path.exists(self.downloaded_file), (
+            f"Downloaded file '{self.downloaded_file}' does not exist."
+        )
+        assert os.path.getsize(self.downloaded_file) > 0, (
+            f"Downloaded file '{self.downloaded_file}' is empty."
+        )

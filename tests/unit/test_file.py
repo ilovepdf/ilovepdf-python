@@ -17,7 +17,6 @@ from ilovepdf.file import BaseFile, File
 from .base_test import AbstractBaseFileTest, AbstractUnitFileTest
 
 
-# pylint: disable=protected-access
 class TestBaseFile(AbstractBaseFileTest):
     """
     Unit tests for the BaseFile class.
@@ -48,9 +47,7 @@ class TestBaseFile(AbstractBaseFileTest):
             "filename": filename,
         }
 
-    def test_initialization_sets_default_values(
-        self, my_task
-    ):  # pylint: disable=unused-argument
+    def test_initialization_sets_default_values(self, my_task):
         """
         Test that BaseFile._DEFAULT_PAYLOAD contains expected default values.
         """

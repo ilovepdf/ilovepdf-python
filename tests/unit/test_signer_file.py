@@ -9,7 +9,6 @@ from .base_test import AbstractUnitTaskElementTest
 from .samples_utils import FileSamples
 
 
-# pylint: disable=protected-access
 class TestSignerFile(AbstractUnitTaskElementTest):
     """Unit tests for the SignerFile class."""
 

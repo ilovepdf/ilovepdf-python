@@ -9,7 +9,6 @@ from ilovepdf.rotate_task import ROTATE_ANGLE_OPTIONS, RotateFile
 from .base_test import AbstractUnitFileTest, AbstractUnitTaskTest
 
 
-# pylint: disable=protected-access
 class TestRotateFile(AbstractUnitFileTest):
     """Unit tests for the RotateFile class."""
 

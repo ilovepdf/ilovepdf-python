@@ -8,8 +8,6 @@ import pytest
 
 from ilovepdf.task import PayloadBuilder, TaskStateManager
 
-# pylint: disable=protected-access
-
 
 class TestPayloadBuilderInitialization:
     """Unit tests for PayloadBuilder initialization."""

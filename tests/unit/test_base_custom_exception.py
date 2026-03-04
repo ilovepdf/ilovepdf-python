@@ -8,8 +8,6 @@ import pytest
 
 from ilovepdf.exceptions import BaseCustomException
 
-# pylint: disable=protected-access
-
 
 class TestBaseCustomException:
     """Unit tests for BaseCustomException."""

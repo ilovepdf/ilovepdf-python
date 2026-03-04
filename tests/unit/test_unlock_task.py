@@ -9,7 +9,6 @@ from ilovepdf import UnlockTask
 from .base_test import AbstractUnitTaskTest
 
 
-# pylint: disable=protected-access
 class TestUnlockTask(AbstractUnitTaskTest):
     """Unit tests for the UnlockTask class from ilovepdf."""
 

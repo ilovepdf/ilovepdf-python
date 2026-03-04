@@ -33,17 +33,18 @@ pytest tests/integration
 | test_integration_merge_task.py              | Integration tests for MergeTask, merging multiple PDF files.                                  |
 | test_integration_office_pdf_task.py         | Integration tests for OfficePdfTask, converting Office files to PDF.                          |
 | test_integration_pdfocr_task.py             | Integration tests for PdfOcrTask, performing OCR on scanned PDFs.                             |
-| test_integration_pdftopdfa_task.py          | Integration tests for PdfToPdfATask, converting PDFs to PDF/A format.                         |
-| test_integration_protect_task.py            | Integration tests for ProtectTask, adding password protection to PDFs.                        |
+| test_integration_pdftojpg_task.py           | Integration tests for PdfToJpgTask, converting PDF files to JPG images in 'pages' and 'extract' modes. |
+| test_integration_pdftopdfa_task.py           | Integration tests for PdfToPdfATask, converting PDFs to PDF/A format.                         |
+| test_integration_validate_pdfa_task.py       | Integration tests for ValidatePdfATask, validating PDF/A compliance of PDF files.             |
+| test_integration_protect_task.py             | Integration tests for ProtectTask, adding password protection to PDFs.                        |
 | test_integration_repair_task.py             | Integration tests for RepairTask, repairing corrupted PDFs.                                   |
 | test_integration_rotate_task.py             | Integration tests for RotateTask, rotating PDF pages.                                         |
 | test_integration_sign_basic_task.py         | Integration tests for SignTask, digital signature workflows.                                  |
 | test_integration_split_task.py              | Integration tests for SplitTask, splitting PDFs by range, pages, or size.                     |
 | test_integration_unlock_task.py             | Integration tests for UnlockTask, removing password protection from PDFs.                     |
 | test_integration_watermark_task.py          | Integration tests for WatermarkTask, adding text or image watermarks to PDFs.                 |
-| test_integration_removebackground_task.py   | Integration tests for RemoveBackgroundTask, verifying background removal in PDFs.             |
-| test_integration_resize_task.py             | Integration tests for ResizeTask, resizing images within PDFs.                                |
-| test_integration_upscale_task.py            | Integration tests for UpscaleTask, AI-based upscaling of images in PDFs.                      |
+| test_integration_pagenumbers_task.py        | Integration tests for PageNumbersTask, adding page numbers to PDFs with customizable appearance and format. |
+| test_integration_editpdf_task.py            | Integration tests for EditPdfTask, covering text, image, and SVG elements plus execute/download workflows. |
 
 Update this table as new integration tests are added.
 

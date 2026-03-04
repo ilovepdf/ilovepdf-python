@@ -9,7 +9,6 @@ from ilovepdf import RepairTask
 from .base_test import AbstractUnitTaskTest
 
 
-# pylint: disable=protected-access
 class TestRepairTask(AbstractUnitTaskTest):
     """
     Unit tests for RepairTask.

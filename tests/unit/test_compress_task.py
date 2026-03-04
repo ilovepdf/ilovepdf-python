@@ -1,6 +1,6 @@
 """Unit tests for the CompressTask class in the ilovepdf module.
 
-These tests verify the correct behavior and parameter validation for image compression
+These tests verify the correct behavior and parameter validation for PDF compression
 tasks using CompressTask.
 """
 
@@ -13,7 +13,6 @@ from ilovepdf.exceptions import InvalidChoiceError
 from .base_test import AbstractUnitTaskTest
 
 
-# pylint: disable=protected-access
 class TestCompressTask(AbstractUnitTaskTest):
     """
     Unit tests for CompressTask.

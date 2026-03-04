@@ -21,7 +21,6 @@ from ilovepdf.watermark_task import (
 from .base_test import AbstractUnitTaskTest
 
 
-# pylint: disable=protected-access,too-many-public-methods)
 class TestWatermarkTask(AbstractUnitTaskTest):
     """Unit tests for WatermarkTask behavior and validation."""
 

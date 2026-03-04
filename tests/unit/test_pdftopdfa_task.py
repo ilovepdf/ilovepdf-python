@@ -9,7 +9,6 @@ from ilovepdf.pdftopdfa_task import PDFA_CONFORMANCE_OPTIONS
 from .base_test import AbstractUnitTaskTest
 
 
-# pylint: disable=protected-access
 class TestPdfToPdfATask(AbstractUnitTaskTest):
     """Unit tests for PdfToPdfATask covering defaults and validation."""
 

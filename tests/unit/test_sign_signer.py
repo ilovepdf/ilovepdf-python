@@ -9,7 +9,6 @@ from ilovepdf.sign import Signer, SignerFile
 from .base_test import AbstractUnitTaskElementTest
 
 
-# pylint: disable=protected-access
 class TestSigner(AbstractUnitTaskElementTest):
     """Unit tests for the Signer class."""
 

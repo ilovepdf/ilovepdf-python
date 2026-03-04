@@ -16,8 +16,6 @@ from ilovepdf.exceptions import (
 )
 from ilovepdf.ilovepdf_api import ErrorRouter
 
-# pylint: disable=protected-access
-
 
 class TestErrorRouterUploadErrors:
     """Unit tests for upload error handling in ErrorRouter."""

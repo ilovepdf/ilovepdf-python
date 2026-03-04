@@ -8,7 +8,6 @@ from ilovepdf.exceptions import FileExtensionNotAllowed, TooManyFilesError
 from .base_test import AbstractUnitTaskTest
 
 
-# pylint: disable=protected-access
 class TestOfficePdfTask(AbstractUnitTaskTest):
     """Unit tests for the OfficePdfTask class."""
 

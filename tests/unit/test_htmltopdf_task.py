@@ -10,7 +10,6 @@ from ilovepdf.htmltopdf_task import HtmlToPdfTask
 from tests.unit.base_test import AbstractUnitTaskTest
 
 
-# pylint: disable=protected-access
 class TestHtmlToPdfTask(AbstractUnitTaskTest):
     """Unit tests for the HtmlToPdfTask class."""
 

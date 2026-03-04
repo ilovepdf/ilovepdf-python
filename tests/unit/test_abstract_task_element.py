@@ -15,7 +15,6 @@ from ilovepdf.exceptions.payload_field_errors import MissingPayloadFieldError
 from .base_test import AbstractUnitTaskElementTest
 
 
-# pylint: disable=protected-access,too-few-public-methods,redefined-outer-name
 class DummyElement(AbstractTaskElement):
     """Dummy element for testing required fields and attribute logic."""
 
@@ -148,6 +147,7 @@ class TestAbstractTaskElement(AbstractUnitTaskElementTest):
         self.assert_missing_required_fields_raise(my_task, ["name", "address"])
 
     def test_get_default_payload(self, my_task):
+        """Verify _get_default_payload returns the element's default payload."""
         assert my_task._get_default_payload() == {
             "name": "John",
             "address": "123 Main St",
@@ -156,18 +156,24 @@ class TestAbstractTaskElement(AbstractUnitTaskElementTest):
 
 
 class TestInheritanceDefaultPayloadAndRequiredFields:
-    """Test _get_default_payload() and _get_required_fields() merge from class hierarchy."""
+    """Verify merging of default payloads and required fields across inheritance."""
 
     def test_default_payload_merge_hierarchy(self):
         """Should merge _DEFAULT_PAYLOAD from all levels in hierarchy."""
 
         class Base(AbstractTaskElement):
+            """Base class."""
+
             _DEFAULT_PAYLOAD = {"a": 1}
 
         class Child(Base):
+            """Child class."""
+
             _DEFAULT_PAYLOAD = {"b": 2}
 
         class GrandChild(Child):
+            """Grandchild class."""
+
             _DEFAULT_PAYLOAD = {"c": 3}
 
         assert Base._get_default_payload() == {"a": 1}
@@ -178,9 +184,13 @@ class TestInheritanceDefaultPayloadAndRequiredFields:
         """Child should override parent's payload values."""
 
         class Base(AbstractTaskElement):
+            """Base class."""
+
             _DEFAULT_PAYLOAD = {"x": "old", "y": 2}
 
         class Child(Base):
+            """Child class."""
+
             _DEFAULT_PAYLOAD = {"x": "new", "z": 3}
 
         assert Child._get_default_payload() == {"x": "new", "y": 2, "z": 3}
@@ -189,12 +199,18 @@ class TestInheritanceDefaultPayloadAndRequiredFields:
         """Should merge REQUIRED_FIELDS from all levels without duplicates."""
 
         class Base(AbstractTaskElement):
+            """Base required fields."""
+
             REQUIRED_FIELDS = ["a", "b"]
 
         class Child(Base):
+            """Child required fields, with duplicates."""
+
             REQUIRED_FIELDS = ["b", "c"]  # b is duplicate
 
         class GrandChild(Child):
+            """GrandChild required fields, with duplicates."""
+
             REQUIRED_FIELDS = ["c", "d"]  # c is duplicate
 
         assert Base._get_required_fields() == ["a", "b"]
@@ -205,10 +221,14 @@ class TestInheritanceDefaultPayloadAndRequiredFields:
         """Both methods should work together in complex hierarchy."""
 
         class Base(AbstractTaskElement):
+            """Base class with default payload and required fields."""
+
             _DEFAULT_PAYLOAD = {"a": 1}
             REQUIRED_FIELDS = ["a"]
 
         class Child(Base):
+            """Child class with its own default payload and required fields."""
+
             _DEFAULT_PAYLOAD = {"b": 2}
             REQUIRED_FIELDS = ["b"]
 

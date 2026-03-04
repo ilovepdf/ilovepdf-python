@@ -11,8 +11,6 @@ from ilovepdf.task import Task
 
 from .base_test import AbstractUnitTaskTest
 
-# pylint: disable=protected-access
-
 
 class DummyTask(Task):
     """Generic task class for testing."""
@@ -56,18 +54,18 @@ class TestDummyTask(AbstractUnitTaskTest):
         assert my_task.task == my_task._to_payload()["task"] == task_value
 
     # Tests for validate extensions
-    def test_accepts_valid_image_extensions(self, my_task):
-        """Should accept standard image extensions."""
+    def test_accepts_valid_pdf_extensions(self, my_task):
+        """Should accept standard pdf extensions."""
         for ext in [".pdf"]:
             my_task._validate_file_extension(f"file{ext}")
 
-    def test_accepts_uppercase_image_extensions(self, my_task):
-        """Should accept uppercase image extensions."""
+    def test_accepts_uppercase_pdf_extensions(self, my_task):
+        """Should accept uppercase pdf extensions."""
         for ext in [".PDF"]:
             my_task._validate_file_extension(f"file{ext}")
 
     def test_rejects_invalid_extension(self, my_task):
-        """Should raise ValueError for non-image extensions."""
+        """Should raise ValueError for non-pdf extensions."""
         with pytest.raises(FileExtensionNotAllowed):
             my_task._validate_file_extension("file.txt")
 

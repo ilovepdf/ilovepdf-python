@@ -12,7 +12,6 @@ from ilovepdf.exceptions.int_errors import IntOutOfRangeError, NotAnIntError
 from tests.unit.base_test import AbstractUnitTaskTest
 
 
-# pylint: disable=protected-access
 class TestImagePdfTask(AbstractUnitTaskTest):
     """
     Unit tests for the ImagePdfTask class.

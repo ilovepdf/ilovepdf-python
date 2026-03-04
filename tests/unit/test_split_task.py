@@ -9,7 +9,6 @@ from ilovepdf.split_task import SPLIT_MODE_OPTIONS
 from .base_test import AbstractUnitTaskTest
 
 
-# pylint: disable=protected-access
 class TestSplitTask(AbstractUnitTaskTest):
     """Test the SplitTask class."""
 

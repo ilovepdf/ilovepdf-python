@@ -16,8 +16,6 @@ class AuthTest(Ilovepdf):
         """Start the authentication test."""
 
 
-# pylint: disable=bad-option-value
-# pylint: disable=broad-exception-raised
 class TestAuthAPI(BaseTaskIntegrationTest):
     """Test the authentication API."""
 

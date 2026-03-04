@@ -12,7 +12,6 @@ from ilovepdf.exceptions import InvalidChoiceError
 from .base_test import AbstractUnitTaskTest
 
 
-# pylint: disable=protected-access
 class TestExtractTask(AbstractUnitTaskTest):
     """Unit tests for the ExtractTask class in the ilovepdf module."""
 

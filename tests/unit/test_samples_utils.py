@@ -9,7 +9,6 @@ import pytest
 from tests.unit.samples_utils import sample_classes
 
 
-# pylint: disable=protected-access
 @pytest.mark.parametrize("sample_class", sample_classes)
 def test_sample_classes_are_valid(sample_class):
     """Test that all sample classes can be converted to payloads."""

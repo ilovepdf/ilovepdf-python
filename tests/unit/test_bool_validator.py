@@ -10,7 +10,6 @@ from ilovepdf.exceptions import InvalidChoiceError
 from ilovepdf.validators.bool_validator import BoolValidator
 
 
-# pylint: disable=protected-access
 class TestBoolValidator:
     """
     Unit tests for BoolValidator.

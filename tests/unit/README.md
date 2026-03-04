@@ -20,6 +20,11 @@ Unit tests are designed to verify the correctness of individual functions, class
 - `test_ilovepdf_auth_manager.py` - Authentication manager and credential handling
 - `test_error_router.py` - ErrorRouter error handling and exception routing
 
+### Core Classes
+
+- `test_abstract_task_element.py` - AbstractTaskElement base class behavior and attribute handling
+- `test_file.py` - File class construction and properties
+
 ### Task Classes
 
 - `test_task.py` - Base Task class with file management and validation
@@ -32,16 +37,21 @@ Unit tests are designed to verify the correctness of individual functions, class
 - `test_office_pdf_task.py` - OfficePdfTask office file extension validation and single-file enforcement
 - `test_pdfocr_task.py` - PdfOcrTask and OcrFile OCR language configuration
 - `test_pdftopdfa_task.py` - PdfToPdfATask PDF/A conformance and downgrade options
+- `test_validate_pdfa_task.py` - ValidatePdfATask PDF/A compliance validation and result extraction
 - `test_protect_task.py` - ProtectTask password protection and payload validation
 - `test_repair_task.py` - RepairTask single-file enforcement and initialization
 - `test_rotate_task.py` - RotateTask rotation angles and validation
 - `test_sign_task.py` - SignTask signer and file management, property setters, and full flow
+- `test_sign_element.py` - Sign element properties and validation
 - `test_signer_file.py` - SignerFile file and element management for signature tasks
 - `test_sign_signer.py` - Signer signer type, access code, and file association
 - `test_split_task.py` - SplitTask split modes, parameter validation, and payload
 - `test_unlock_task.py` - UnlockTask basic instantiation and payload
 - `test_watermark_task.py` - WatermarkTask watermarking features
-- `test_removebackground_task.py` - RemoveBackgroundTask initialization and configuration
+- `test_pagenumbers_task.py` - PageNumbersTask page numbering features, validation, and appearance options
+- `test_editpdf_element.py` - EditPdfTask element setters, payload validation, and file upload helpers
+- `test_editpdf_task.py` - EditPdfTask end-to-end task configuration and execute/download workflow
+- `test_pdftojpg_task.py` - PdfToJpgTask PDF to JPG conversion mode validation and payload
 
 ### Validators
 
@@ -59,10 +69,12 @@ Unit tests are designed to verify the correctness of individual functions, class
 ### Utilities and Builders
 
 - `test_payload_builder.py` - PayloadBuilder for request payload construction
+- `test_samples_utils.py` - SamplesUtils helper functions for test sample files
 
 ### Base Infrastructure
 
 - `base_test.py` - Reusable test fixtures and base classes (no direct tests)
+- `samples_utils.py` - Utility helpers for locating and managing sample files in tests
 
 ## How to Run Unit Tests
 
@@ -104,7 +116,7 @@ pytest tests/unit -k "compress" -v
 - All new modules and public methods in `ilovepdf/` should have corresponding unit tests here.
 - Each test file should start with a module-level docstring describing its purpose.
 - Use `AbstractUnitTaskTest` as the base class for task-related unit tests.
-- Include the line `# pylint: disable=protected-access` at the top of test files that access protected members.
+- Include the module-level docstring example shown above when creating new test files.
 - When adding new tests, update this README to reflect the changes.
 
 ---

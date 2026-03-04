@@ -10,7 +10,7 @@ from ilovepdf import PdfToPdfATask
 from .base_task_integration_test import BaseTaskIntegrationTest
 
 
-class TestPdfToPdfATaskIntegration(BaseTaskIntegrationTest[PdfToPdfATask]):
+class TestPdfToPdfATaskIntegration(BaseTaskIntegrationTest):
     """Integration tests for PdfToPdfATask using the iLovePDF API.
 
     Covers:

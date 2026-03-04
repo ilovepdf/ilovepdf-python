@@ -6,8 +6,6 @@ from pytest_mock import MockerFixture
 from ilovepdf.exceptions.auth_exception import AuthException
 from ilovepdf.ilovepdf_api import Ilovepdf
 
-# pylint: disable=protected-access,missing-function-docstring
-
 ERROR_500 = {
     "error": {
         "type": "ServerError",

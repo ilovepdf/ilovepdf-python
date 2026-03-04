@@ -13,7 +13,6 @@ from ilovepdf import ProtectTask
 from .base_test import AbstractUnitTaskTest
 
 
-# pylint: disable=protected-access
 class TestProtectTask(AbstractUnitTaskTest):
     """Unit tests for the ProtectTask class."""
 

@@ -14,7 +14,6 @@ from ilovepdf.sign import Element
 from .base_test import AbstractUnitTaskElementTest
 
 
-# pylint: disable=protected-access,too-many-public-methods
 class TestSignElement(AbstractUnitTaskElementTest):
     """Unit tests for the SignElement class."""
 
@@ -152,8 +151,6 @@ class TestSignElement(AbstractUnitTaskElementTest):
         my_task.size = 8
         with pytest.raises(ValueError, match="Invalid page or page range"):
             my_task.pages = "-2--1"
-        # with pytest.raises(ValueError, match="Invalid page range"):
-        #     my_task.pages = "3,-2--1"
 
     def test_valid_pages_negatives_individuals(self, my_task):
         """Test valid negative individual page numbers."""

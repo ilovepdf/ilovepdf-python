@@ -20,7 +20,6 @@ from .base_test import AbstractUnitTaskTest
 from .samples_utils import FileSamples, SignerSamples
 
 
-# pylint: disable=protected-access, too-many-public-methods, attribute-defined-outside-init
 class TestSignTask(AbstractUnitTaskTest):
     """Unit tests for the SignTask class."""
 
