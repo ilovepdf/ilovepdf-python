@@ -2,6 +2,7 @@
 
 from . import exceptions
 from .compress_task import CompressTask
+from .editpdf_task import EditPdfTask
 from .extract_task import ExtractTask
 from .file import File
 from .htmltopdf_task import HtmlToPdfTask
@@ -9,7 +10,9 @@ from .ilovepdf_api import Ilovepdf
 from .imagepdf_task import ImagePdfTask
 from .merge_task import MergeTask
 from .office_pdf_task import OfficePdfTask
+from .pagenumbers_task import PageNumbersTask
 from .pdfocr_task import PdfOcrTask
+from .pdftojpg_task import PdfToJpgTask
 from .pdftopdfa_task import PdfToPdfATask
 from .protect_task import ProtectTask
 from .repair_task import RepairTask
@@ -18,6 +21,7 @@ from .sign_task import SignTask
 from .split_task import SplitTask
 from .task import Task
 from .unlock_task import UnlockTask
+from .validate_pdfa_task import ValidatePdfATask
 from .watermark_task import WatermarkTask
 
 __all__ = [
@@ -40,4 +44,8 @@ __all__ = [
     "SplitTask",
     "UnlockTask",
     "WatermarkTask",
+    "PdfToJpgTask",
+    "PageNumbersTask",
+    "ValidatePdfATask",
+    "EditPdfTask",
 ]

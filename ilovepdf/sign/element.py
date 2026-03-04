@@ -27,7 +27,6 @@ ElementType = Literal["initials", "signature", "name", "date", "text", "input"]
 ELEMENT_TYPE_OPTIONS = {"initials", "signature", "name", "date", "text", "input"}
 
 
-# pylint: disable=too-many-instance-attributes
 class Element(AbstractTaskElement):
     """Base class for sign elements.
 

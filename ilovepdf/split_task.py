@@ -3,7 +3,7 @@ This module defines the SplitTask class for handling PDF split operations
 with various modes such as ranges, fixed range, remove pages, and filesize.
 """
 
-from typing import Any, Dict, Literal
+from typing import Any, Literal
 
 from ilovepdf.validators import (
     BoolValidator,
@@ -16,8 +16,6 @@ from .task import Task
 
 SplitModeType = Literal["ranges", "fixed_range", "remove_pages", "filesize"]
 SPLIT_MODE_OPTIONS = {"ranges", "fixed_range", "remove_pages", "filesize"}
-
-# pylint: disable=abstract-method
 
 
 class SplitTask(Task):
@@ -169,7 +167,7 @@ class SplitTask(Task):
                 f"to perform this operation."
             )
 
-    def _to_payload(self) -> Dict[str, Any]:
+    def _to_payload(self) -> dict[str, Any]:
         """
         Convert the task to a payload dictionary.
         """

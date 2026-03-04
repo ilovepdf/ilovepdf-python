@@ -2,7 +2,8 @@
 
 import os
 import re
-from typing import Any, Callable, Dict, Generic, List, Optional, TypeVar, cast
+from collections.abc import Callable
+from typing import Any, Generic, TypeVar, cast
 from urllib.parse import unquote
 
 from .abstract_task_element import AbstractTaskElement
@@ -21,7 +22,7 @@ FILE_EXTENSIONS = ["pdf"]
 MAX_SIZE_MB = 100  # File size limit (100 MB)
 
 
-T_FILE = TypeVar("T_FILE", bound=File)  # pylint: disable=invalid-name
+T_FILE = TypeVar("T_FILE", bound=File)
 
 
 T = TypeVar("T")
@@ -48,13 +49,13 @@ class FileManager:
     def validate_extension(
         self,
         file_path: str,
-        extension_list: List[str] | None = None,
+        extension_list: list[str] | None = None,
     ) -> None:
         """Validate that the file extension is allowed.
 
         Args:
             file_path (str): Path to the file.
-            extension_list (List[str] | None): List of allowed extensions.
+            extension_list (list[str] | None): List of allowed extensions.
 
         Raises:
             FileExtensionNotAllowed: If the file extension is not allowed.
@@ -86,8 +87,8 @@ class FileManager:
                 f"File {file_path} exceeds the maximum allowed size ({MAX_SIZE_MB} MB)"
             )
 
-    def get_extension_list(self) -> List[str]:
-        """Get the list of allowed image file extensions.
+    def get_extension_list(self) -> list[str]:
+        """Get the list of allowed file extensions.
 
         Returns:
             List[str]: List of allowed extensions.
@@ -96,12 +97,12 @@ class FileManager:
 
     def get_extension_format(
         self,
-        extension_list: List[str] | None = None,
+        extension_list: list[str] | None = None,
     ) -> tuple:
         """Get extensions in dot format (e.g., '.pdf').
 
         Args:
-            extension_list (List[str] | None): List of extensions to format.
+            extension_list (list[str] | None): List of extensions to format.
 
         Returns:
             tuple: Tuple of formatted extensions.
@@ -222,23 +223,23 @@ class PayloadBuilder:
     for API requests.
     """
 
-    def __init__(self, to_payload_func: Callable[[], Dict[str, Any]]) -> None:
+    def __init__(self, to_payload_func: Callable[[], dict[str, Any]]) -> None:
         """Initialize PayloadBuilder.
 
         Args:
-            to_payload_func (Callable[[], Dict[str, Any]]): Function that returns the
+            to_payload_func (Callable[[], dict[str, Any]]): Function that returns the
                 payload dictionary.
         """
         self._to_payload = to_payload_func
 
-    def build_body(self, version: str) -> Dict[str, Any]:
+    def build_body(self, version: str) -> dict[str, Any]:
         """Build the request body for API operations.
 
         Args:
             version (str): The library version.
 
         Returns:
-            Dict[str, Any]: The request body dictionary.
+            dict[str, Any]: The request body dictionary.
 
         Raises:
             ValueError: If body is invalid.
@@ -254,11 +255,11 @@ class PayloadBuilder:
         return body
 
     @staticmethod
-    def validate_body(body: Dict[str, Any] | None) -> bool:
+    def validate_body(body: dict[str, Any] | None) -> bool:
         """Validate the request body.
 
         Args:
-            body (Dict[str, Any] | None): The request body dictionary.
+            body (dict[str, Any] | None): The request body dictionary.
 
         Returns:
             bool: True if valid.
@@ -336,19 +337,17 @@ class TaskStateManager:
         """
         self.remaining_pages = remaining_pages
 
-    def update_status(self, result: Dict[str, Any]) -> None:
+    def update_status(self, result: dict[str, Any]) -> None:
         """Update task status from result.
 
         Args:
-            result (Dict[str, Any]): The result dictionary from API.
+            result (dict[str, Any]): The result dictionary from API.
         """
         self.status = result.get("status")
         self.status_message = result.get("status_message")
 
 
-class Task(
-    Ilovepdf, Generic[T_FILE], AbstractTaskElement
-):  # pylint: disable=too-many-instance-attributes,too-many-public-methods
+class Task(Ilovepdf, Generic[T_FILE], AbstractTaskElement):
     """
     Class for handling file tasks using the iLovePDF API.
 
@@ -413,7 +412,7 @@ class Task(
             make_start (bool): Whether to start the task immediately.
         """
         super().__init__(public_key, secret_key)
-        self.result: Dict[str, Any] | None = None
+        self.result: dict[str, Any] | None = None
         self._file_manager = FileManager(self.cls_file, self._file_extension)
         self._download_manager = DownloadManager()
         self._payload_builder = PayloadBuilder(self._to_payload)
@@ -511,7 +510,7 @@ class Task(
         return file
 
     def _validate_and_upload_file(
-        self, file_path: str, extension_list: Optional[List[str]] = None, **kwargs: Any
+        self, file_path: str, extension_list: list[str] | None = None, **kwargs: Any
     ) -> T_FILE:
         """Validate and upload a file with optional extension filtering.
 
@@ -581,7 +580,7 @@ class Task(
         self,
         task: str | None,
         file_path: str,
-        extra_params: Dict[str, Any] | None = None,
+        extra_params: dict[str, Any] | None = None,
     ) -> T_FILE:
         """Upload a file to the API for the current task.
 
@@ -601,7 +600,7 @@ class Task(
 
         with open(file_path, "rb") as file_obj:
             files = {"file": file_obj}
-            data: Dict[str, Any] = {"task": task, "v": self.VERSION}
+            data: dict[str, Any] = {"task": task, "v": self.VERSION}
             if extra_params:
                 data.update(extra_params)
             body = {"files": files, "data": data}
@@ -615,7 +614,7 @@ class Task(
         self,
         server: str | None = None,
         task_id: str | None = None,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Get the status of the current task from the API.
 
         Args:
@@ -876,13 +875,13 @@ class Task(
         return self._state_manager.remaining_credits
 
     def _validate_file_extension(
-        self, file_path: str, extension_list: List[str] | None = None
+        self, file_path: str, extension_list: list[str] | None = None
     ) -> None:
         """Validate file extension.
 
         Args:
             file_path (str): Path to the file.
-            extension_list (List[str | None]): List of allowed extensions.
+            extension_list (list[str | None]): List of allowed extensions.
 
         Raises:
             ValueError: If the file extension is not allowed.
@@ -897,8 +896,8 @@ class Task(
         """
         self._state_manager.validate_task_started()
 
-    def get_extension_list(self) -> List[str]:
-        """Get the list of allowed image file extensions.
+    def get_extension_list(self) -> list[str]:
+        """Get the list of allowed file extensions.
 
         Returns:
             List[str]: List of allowed extensions.
@@ -906,7 +905,7 @@ class Task(
         return self._file_manager.get_extension_list()
 
     def get_extension_list_format(
-        self, extension_list: List[str] | None = None
+        self, extension_list: list[str] | None = None
     ) -> tuple:
         """Get extensions in dot format.
 
@@ -942,7 +941,7 @@ class Task(
         """
         self._state_manager.set_remaining_pages(remaining_pages)
 
-    def validate_body(self, body: Dict[str, Any]) -> bool:
+    def validate_body(self, body: dict[str, Any]) -> bool:
         """Validate request body.
 
         Args:
@@ -956,7 +955,7 @@ class Task(
         """
         return self._payload_builder.validate_body(body)
 
-    def build_body(self) -> Dict[str, Any]:
+    def build_body(self) -> dict[str, Any]:
         """Build request body.
 
         Returns:

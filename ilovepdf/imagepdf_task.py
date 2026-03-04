@@ -8,8 +8,9 @@ behavior.
 
 from typing import Literal
 
-from ilovepdf.task import Task
-from ilovepdf.validators import BoolValidator, ChoiceValidator, IntValidator
+from .helpers import IMAGE_FILE_EXTENSIONS
+from .task import Task
+from .validators import BoolValidator, ChoiceValidator, IntValidator
 
 OrientationType = Literal["portrait", "landscape"]
 ORIENTATION_OPTIONS = {"portrait", "landscape"}
@@ -21,9 +22,6 @@ RotateType = Literal[0, 90, 180, 270]
 ROTATE_OPTIONS = {0, 90, 180, 270}
 
 
-FILE_EXTENSIONS = ["jpg", "jpeg", "png", "gif", "bmp", "tiff", "tif", "webp"]
-
-
 class ImagePdfTask(Task):
     """
     Handles image to PDF conversion tasks using the iLovePDF API.
@@ -33,7 +31,7 @@ class ImagePdfTask(Task):
     """
 
     _tool = "imagepdf"
-    _file_extension = FILE_EXTENSIONS
+    _file_extension = IMAGE_FILE_EXTENSIONS
 
     _DEFAULT_PAYLOAD = {
         "orientation": "portrait",

@@ -1,10 +1,8 @@
 """This module defines the SignTask class for handling signature tasks in the ilovepdf
 package."""
 
-#
-
-
-from typing import Any, Dict, List, Literal, Optional, Sequence
+from collections.abc import Sequence
+from typing import Any, Literal
 
 from ilovepdf.exceptions import NotImplementedException
 
@@ -77,7 +75,6 @@ LANGUAGE_OPTIONS = {
 MAXIMUM_NUMBER_ALLOWED = 5
 
 
-# pylint: disable=too-many-instance-attributes, too-many-public-methods
 class SignTask(Task):
     """Class representing a signature task in the ilovepdf package."""
 
@@ -130,11 +127,11 @@ class SignTask(Task):
 
     # Getters and Setters of signers
     @property
-    def signers(self) -> List[Signer]:
+    def signers(self) -> list[Signer]:
         """Get the list of signers for the signature task."""
         return self._get_attr("signers")
 
-    def add_signer(self, signer: Optional[Signer] = None) -> Signer:
+    def add_signer(self, signer: Signer | None = None) -> Signer:
         """Add a signer to the signature task."""
         if len(self.signers) >= MAX_SIGNERS:
             raise ValueError("Maximum number of signers reached")
@@ -255,7 +252,7 @@ class SignTask(Task):
     def download(self, path=None):
         raise NotImplementedException("This API call is not available for a SignTask")
 
-    def _to_payload(self) -> Dict[str, Any]:
+    def _to_payload(self) -> dict[str, Any]:
         payload = super()._to_payload()
         del payload["tool"]
         return payload

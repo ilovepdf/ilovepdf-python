@@ -4,9 +4,8 @@ Supports validation for multiple date formats commonly used in ilovepdf tasks.
 """
 
 from datetime import datetime
-from typing import List, Optional
 
-DATE_FORMATS: List[str] = [
+DATE_FORMATS: list[str] = [
     "%d-%m-%Y",
     "%d/%m/%Y",
     "%d.%m.%Y",
@@ -23,13 +22,13 @@ class DateValidator:
     """Validator for date strings with multiple allowed formats."""
 
     @staticmethod
-    def validate_format(date_str: str, param_name: Optional[str] = None) -> None:
+    def validate_format(date_str: str, param_name: str | None = None) -> None:
         """
         Validates that the input string matches one of the allowed date formats.
 
         Args:
             date_str (str): The date string to validate.
-            param_name (Optional[str]): The name of the parameter (for error messages).
+            param_name: Optional name of the parameter (for error messages).
 
         Raises:
             ValueError: If the date string does not match any allowed format.
@@ -53,18 +52,19 @@ class DateValidator:
     @staticmethod
     def validate_in_range(
         date_str: str,
-        min_date: Optional[str] = None,
-        max_date: Optional[str] = None,
-        param_name: Optional[str] = None,
+        min_date: str | None = None,
+        max_date: str | None = None,
+        param_name: str | None = None,
     ) -> None:
         """
-        Validates that the date string is within the specified range.
+        Validate that the date string is within the specified range.
 
         Args:
             date_str (str): The date string to validate.
-            min_date (Optional[str]): Minimum allowed date (same format as date_str).
-            max_date (Optional[str]): Maximum allowed date (same format as date_str).
-            param_name (Optional[str]): The name of the parameter (for error messages).
+            min_date (str | None): Minimum allowed date (same format as date_str).
+            max_date (str | None): Maximum allowed date (same format as date_str).
+            param_name (str | None):
+                Optional name of the parameter (for error messages).
 
         Raises:
             ValueError: If the date string is not in a valid format or out of range.

@@ -4,17 +4,21 @@ Provides the WatermarkTask class to configure text or image watermarks,
 including positioning, typography, and rendering options.
 """
 
-from typing import Any, Literal, Optional
+from typing import Any, Literal
 
-from ilovepdf import File
-from ilovepdf.exceptions import IntOutOfRangeError, InvalidChoiceError
-from ilovepdf.task import Task
-from ilovepdf.validators import (
-    BoolValidator,
-    ChoiceValidator,
-    IntValidator,
-    StringValidator,
+from .exceptions import IntOutOfRangeError, InvalidChoiceError
+from .file import File
+from .helpers import (
+    FONT_FAMILY_OPTIONS,
+    FONT_STYLE_OPTIONS,
+    IMAGE_FILE_EXTENSIONS,
+    LAYER_OPTIONS,
+    FontFamilyType,
+    FontStyleType,
+    LayerType,
 )
+from .task import Task
+from .validators import BoolValidator, ChoiceValidator, IntValidator, StringValidator
 
 WatermarkModeType = Literal["text", "image"]
 WATERMARK_MODE_OPTIONS = {"text", "image"}
@@ -24,35 +28,6 @@ VERTICAL_POSITION_OPTIONS = {"bottom", "top", "middle"}
 
 HorizontalPositionType = Literal["left", "center", "right"]
 HORIZONTAL_POSITION_OPTIONS = {"left", "center", "right"}
-
-FontFamilyType = Literal[
-    "Arial",
-    "Arial Unicode MS",
-    "Verdana",
-    "Courier",
-    "Times New Roman",
-    "Comic Sans MS",
-    "WenQuanYi Zen Hei",
-    "Lohit Marathi",
-]
-FONT_FAMILY_OPTIONS = {
-    "Arial",
-    "Arial Unicode MS",
-    "Verdana",
-    "Courier",
-    "Times New Roman",
-    "Comic Sans MS",
-    "WenQuanYi Zen Hei",
-    "Lohit Marathi",
-}
-
-FontStyleType = Literal[None, "Bold", "Italic"]
-FONT_STYLE_OPTIONS = {None, "Bold", "Italic"}
-
-LayerType = Literal["above", "below"]
-LAYER_OPTIONS = {"above", "below"}
-
-IMG_FILE_EXTENSIONS = ["jpg", "jpeg", "png", "gif", "bmp", "tiff", "tif", "webp"]
 
 
 class WatermarkTask(Task):
@@ -121,7 +96,7 @@ class WatermarkTask(Task):
         self._set_attr("mode", value)
 
     @property
-    def text(self) -> Optional[str]:
+    def text(self) -> str | None:
         """Gets the text used for text watermarks. Default is None."""
 
         return self._get_attr("text")
@@ -164,13 +139,13 @@ class WatermarkTask(Task):
             >>> watermark_file = task.set_watermark_image('/path/to/logo.png')
         """
         file = self._validate_and_upload_file(
-            file_path, extension_list=IMG_FILE_EXTENSIONS, **kwargs
+            file_path, extension_list=IMAGE_FILE_EXTENSIONS, **kwargs
         )
         self.image = file.server_filename
         return file
 
     @property
-    def image(self) -> Optional[str]:
+    def image(self) -> str | None:
         """Gets the server filename used for image watermarks. Default is None."""
 
         return self._get_attr("image")

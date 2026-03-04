@@ -1,6 +1,6 @@
-"""Module containing the ReceiverAbstract class for handling receiver information."""
+"""Module containing the Signer class for handling signer information."""
 
-from typing import Literal, Optional
+from typing import Literal
 
 from ilovepdf.abstract_task_element import AbstractTaskElement
 from ilovepdf.file import File
@@ -28,14 +28,14 @@ class Signer(AbstractTaskElement):
     REQUIRED_FIELDS = ["name", "email", "files"]
 
     def __init__(
-        self, *args, name: Optional[str] = None, email: Optional[str] = None, **kwargs
+        self, *args, name: str | None = None, email: str | None = None, **kwargs
     ):
         """
         Initializes a Signer instance.
 
         Args:
-            name (Optional[str]): The name of the signer.
-            email (Optional[str]): The email address of the signer.
+            name (str | None): The name of the signer.
+            email (str | None): The email address of the signer.
 
         Example:
             signer = Signer(name="John Doe", email="mark@email.com")

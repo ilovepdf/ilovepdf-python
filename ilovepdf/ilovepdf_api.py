@@ -10,9 +10,10 @@ import logging
 import os
 import pprint
 import time
+from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import datetime, timezone
-from typing import Any, Callable, Dict, Tuple
+from typing import Any
 
 import jwt
 import requests
@@ -54,8 +55,6 @@ HTTP_INTERNAL_SERVER_ERROR = 500
 # Endpoints requiring large timeout
 LARGE_TIMEOUT_ENDPOINTS = ["process", "upload"]
 
-# pylint: disable=too-few-public-methods
-
 
 def _setup_logging(loglevel, logfile=None) -> logging.Logger:
     """Configure and return logger for this module.
@@ -74,10 +73,10 @@ def _setup_logging(loglevel, logfile=None) -> logging.Logger:
 
     logging.basicConfig(**params)
     logging.getLogger("urllib3").setLevel(loglevel)
-    if loglevel == "DEBUG":
-        logging.debug("DEBUG mode activated!")
     logger = logging.getLogger(__name__)
     logger.setLevel(loglevel)
+    if loglevel == "DEBUG":
+        logger.debug("DEBUG mode activated!")
     return logger
 
 
@@ -93,13 +92,13 @@ class AuthManager:
     Attributes:
         secret_key (str): API secret key for authentication.
         public_key (str): API public key for authentication.
-        token_cache (Optional[Tuple[str, int]]): Cached token and expiration.
-        token (Optional[str]): Current JWT token.
+        token_cache (tuple[str, int] | None): Cached token and expiration.
+        token (str | None): Current JWT token.
     """
 
     secret_key: str
     public_key: str
-    token_cache: Tuple[str, int] | None = None
+    token_cache: tuple[str, int] | None = None
     token: str | None = None
 
 
@@ -108,10 +107,10 @@ class ServerConfig:
     """Stores server configuration and timeout settings for iLovePDF API.
 
     Attributes:
-        worker_server (Optional[str]): Worker server URL for task processing.
+        worker_server (str | None): Worker server URL for task processing.
         time_delay (int): Time delay in seconds. Default is 5400.
         timeout (int): Request timeout in seconds. Default is 10.
-        timeout_large (Optional[int]): Timeout for large operations.
+        timeout_large (int | None): Timeout for large operations.
     """
 
     worker_server: str | None = None
@@ -126,7 +125,7 @@ class EncryptionConfig:
 
     Attributes:
         encrypted (bool): Whether file encryption is enabled.
-        encrypt_key (Optional[str]): Encryption key for file operations.
+        encrypt_key (str | None): Encryption key for file operations.
     """
 
     encrypted: bool = False
@@ -193,14 +192,14 @@ class RequestBuilder:
             return self.server_config.timeout_large
         return self.server_config.timeout
 
-    def build_headers(self, endpoint: str) -> Dict[str, str]:
+    def build_headers(self, endpoint: str) -> dict[str, str]:
         """Build headers for the API request.
 
         Args:
             endpoint (str): API endpoint path.
 
         Returns:
-            Dict[str, str]: Request headers.
+            dict[str, str]: Request headers.
         """
         if endpoint == "auth":
             return {}
@@ -212,24 +211,25 @@ class RequestBuilder:
 
     def prepare_params(
         self,
-        params: Dict[str, Any] | None,
-        headers: Dict[str, str],
+        params: dict[str, Any] | None,
+        headers: dict[str, str],
         endpoint: str,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Prepare and normalize request parameters.
 
         Args:
-            params (Optional[Dict[str, Any]]): Original parameters.
-            headers (Dict[str, str]): Request headers.
+            params (dict[str, Any] | None): Original parameters.
+            headers (dict[str, str]): Request headers.
             endpoint (str): API endpoint path.
 
         Returns:
-            Dict[str, Any]: Prepared request parameters.
+            dict[str, Any]: Prepared request parameters.
         """
         params = dict(params or {})
         params.setdefault("headers", headers)
 
-        # Only add data dict if not a start endpoint (GET requests don't need empty data)
+        # Only add data dict if not a start endpoint
+        # (GET requests don't need empty data)
         if not endpoint.startswith("start/"):
             params.setdefault("data", {})
 
@@ -256,14 +256,14 @@ class ResponseHandler:
     """
 
     @staticmethod
-    def parse_json(response: requests.Response) -> Dict[str, Any]:
+    def parse_json(response: requests.Response) -> dict[str, Any]:
         """Parse JSON from response body.
 
         Args:
             response (requests.Response): The HTTP response.
 
         Returns:
-            Dict[str, Any]: Parsed JSON or error dict if parsing fails.
+            dict[str, Any]: Parsed JSON or error dict if parsing fails.
         """
         try:
             return response.json()
@@ -296,19 +296,19 @@ class ErrorRouter:
 
     def __init__(self) -> None:
         """Initialize ErrorRouter."""
-        self.endpoint_handlers: Dict[str, Callable[[Any, int], None]] = {
+        self.endpoint_handlers: dict[str, Callable[[Any, int], None]] = {
             "upload": self._handle_upload_response,
             "process": self._handle_process_response,
         }
 
     def route(
-        self, endpoint: str, response_body: Dict[str, Any], response_code: int
+        self, endpoint: str, response_body: dict[str, Any], response_code: int
     ) -> None:
         """Route error handling based on endpoint and status code.
 
         Args:
             endpoint (str): API endpoint path.
-            response_body (Dict[str, Any]): Response body.
+            response_body (dict[str, Any]): Response body.
             response_code (int): HTTP status code.
 
         Raises:
@@ -346,12 +346,12 @@ class ErrorRouter:
 
     @staticmethod
     def _handle_upload_response(
-        response_body: Dict[str, Any] | str, response_code: int
+        response_body: dict[str, Any] | str, response_code: int
     ) -> None:
         """Handle upload error responses.
 
         Args:
-            response_body (Union[Dict[str, Any], str]): Response body.
+            response_body (dict[str, Any] | str): Response body.
             response_code (int): HTTP status code.
 
         Raises:
@@ -367,12 +367,12 @@ class ErrorRouter:
 
     @staticmethod
     def _handle_process_response(
-        response_body: Dict[str, Any], response_code: int
+        response_body: dict[str, Any], response_code: int
     ) -> None:
         """Handle process error responses.
 
         Args:
-            response_body (Dict[str, Any]): Response body.
+            response_body (dict[str, Any]): Response body.
             response_code (int): HTTP status code.
 
         Raises:
@@ -386,12 +386,12 @@ class ErrorRouter:
 
     @staticmethod
     def _handle_download_response(
-        response_body: Dict[str, Any], response_code: int
+        response_body: dict[str, Any], response_code: int
     ) -> None:
         """Handle download error responses.
 
         Args:
-            response_body (Dict[str, Any]): Response body.
+            response_body (dict[str, Any]): Response body.
             response_code (int): HTTP status code.
 
         Raises:
@@ -405,12 +405,12 @@ class ErrorRouter:
 
     @staticmethod
     def _handle_start_response(
-        response_body: Dict[str, Any], response_code: int
+        response_body: dict[str, Any], response_code: int
     ) -> None:
         """Handle start error responses.
 
         Args:
-            response_body (Dict[str, Any]): Response body.
+            response_body (dict[str, Any]): Response body.
             response_code (int): HTTP status code.
 
         Raises:
@@ -427,13 +427,13 @@ class ErrorRouter:
 
     @staticmethod
     def _handle_bad_request(
-        endpoint: str, response_body: Dict[str, Any], response_code: int
+        endpoint: str, response_body: dict[str, Any], response_code: int
     ) -> None:
         """Handle bad request (400) error responses.
 
         Args:
             endpoint (str): API endpoint path.
-            response_body (Dict[str, Any]): Response body.
+            response_body (dict[str, Any]): Response body.
             response_code (int): HTTP status code.
 
         Raises:
@@ -465,12 +465,12 @@ class ErrorRouter:
 
     @staticmethod
     def _handle_generic_error(
-        response_body: Dict[str, Any], response_code: int
+        response_body: dict[str, Any], response_code: int
     ) -> None:
         """Handle generic error responses.
 
         Args:
-            response_body (Dict[str, Any]): Response body.
+            response_body (dict[str, Any]): Response body.
             response_code (int): HTTP status code.
 
         Raises:
@@ -485,7 +485,7 @@ class ErrorRouter:
         )
 
 
-class Ilovepdf:  # pylint: disable=too-many-public-methods
+class Ilovepdf:
     """
     Class for interacting with the iLovePDF API.
 
@@ -545,7 +545,7 @@ class Ilovepdf:  # pylint: disable=too-many-public-methods
         """Validate that an API key is a non-empty string.
 
         Args:
-            key (Optional[str]): The API key to validate.
+            key (str | None): The API key to validate.
             key_name (str): Name of the key for error messages.
 
         Raises:
@@ -712,13 +712,14 @@ class Ilovepdf:  # pylint: disable=too-many-public-methods
             str: Locally generated JWT token.
         """
         now = int(datetime.now(timezone.utc).timestamp())
-        exp = now + TOKEN_EXPIRE_SECONDS
+        delay = self.server.time_delay
+        exp = now + TOKEN_EXPIRE_SECONDS + delay
 
         payload = {
             "iss": API_HOST,
             "aud": API_HOST,
-            "iat": now,
-            "nbf": now,
+            "iat": now - delay,
+            "nbf": now - delay,
             "exp": exp,
             "jti": self.auth.public_key,
         }
@@ -736,7 +737,7 @@ class Ilovepdf:  # pylint: disable=too-many-public-methods
             token (str): The JWT token to cache.
         """
         now = int(datetime.now(timezone.utc).timestamp())
-        exp = now + TOKEN_EXPIRE_SECONDS
+        exp = now + TOKEN_EXPIRE_SECONDS + self.server.time_delay
         self.auth.token_cache = (token, exp)
         self.auth.token = token
 
@@ -750,7 +751,7 @@ class Ilovepdf:  # pylint: disable=too-many-public-methods
             return self.auth.token
 
         current_time = int(time.time())
-        token_dict: Dict[str, int | str | None] = {
+        token_dict: dict[str, int | str | None] = {
             "iss": API_HOST,
             "aud": API_HOST,
             "iat": current_time - self.server.time_delay,
@@ -800,7 +801,7 @@ class Ilovepdf:  # pylint: disable=too-many-public-methods
         """Get the worker server URL.
 
         Returns:
-            Optional[str]: Worker server URL if set, otherwise None.
+            str | None: Worker server URL if set, otherwise None.
         """
         return self.server.worker_server
 
@@ -808,7 +809,7 @@ class Ilovepdf:  # pylint: disable=too-many-public-methods
         """Set the worker server URL.
 
         Args:
-            worker_server (Optional[str]): The worker server URL for task
+            worker_server (str | None): The worker server URL for task
                 processing, or None to clear it.
         """
         self.server.worker_server = worker_server
@@ -825,7 +826,7 @@ class Ilovepdf:  # pylint: disable=too-many-public-methods
         """Get the encryption key.
 
         Returns:
-            Optional[str]: The encryption key if set, otherwise None.
+            str | None: The encryption key if set, otherwise None.
         """
         return self.encryption.encrypt_key
 
@@ -833,7 +834,7 @@ class Ilovepdf:  # pylint: disable=too-many-public-methods
         self,
         method: str,
         endpoint: str,
-        params: Dict[str, Any] | None = None,
+        params: dict[str, Any] | None = None,
         start: bool = False,
     ) -> requests.Response:
         """Send a request to the iLovePDF API.
@@ -841,7 +842,7 @@ class Ilovepdf:  # pylint: disable=too-many-public-methods
         Args:
             method (str): HTTP method (GET, POST, etc.).
             endpoint (str): API endpoint path.
-            params (Optional[Dict[str, Any]]): Request parameters.
+            params (dict[str, Any] | None): Request parameters.
             start (bool): Whether this is a start server request.
 
         Returns:
@@ -874,7 +875,7 @@ class Ilovepdf:  # pylint: disable=too-many-public-methods
         return self._handle_response(response, endpoint)
 
     def _execute_request(
-        self, method: str, url: str, timeout: int, params: Dict[str, Any]
+        self, method: str, url: str, timeout: int, params: dict[str, Any]
     ) -> requests.Response:
         """Execute the HTTP request.
 
@@ -882,7 +883,7 @@ class Ilovepdf:  # pylint: disable=too-many-public-methods
             method (str): HTTP method.
             url (str): Complete URL.
             timeout (int): Request timeout.
-            params (Dict[str, Any]): Request parameters.
+            params (dict[str, Any]): Request parameters.
 
         Returns:
             requests.Response: The HTTP response.
@@ -917,7 +918,7 @@ class Ilovepdf:  # pylint: disable=too-many-public-methods
             DownloadException: If download fails.
             StartException: If start operation fails.
         """
-        response_code: int = response.status_code
+        response_code: int = response.status_code or 0
 
         _logger.debug(
             "RESPONSE: status=%s, content_type=%s",
@@ -944,7 +945,7 @@ class Ilovepdf:  # pylint: disable=too-many-public-methods
 
         return response
 
-    def get_status(self, server: str, task_id: str) -> Dict[str, Any]:
+    def get_status(self, server: str, task_id: str) -> dict[str, Any]:
         """Get the status of a task.
 
         Args:
@@ -952,7 +953,7 @@ class Ilovepdf:  # pylint: disable=too-many-public-methods
             task_id (str): The task identifier.
 
         Returns:
-            Dict[str, Any]: Task status information.
+            dict[str, Any]: Task status information.
         """
         original_worker_server = self.get_worker_server()
         self.set_worker_server(server)
@@ -960,11 +961,11 @@ class Ilovepdf:  # pylint: disable=too-many-public-methods
         self.set_worker_server(original_worker_server)
         return response.json()
 
-    def get_updated_info(self) -> Dict[str, Any]:
+    def get_updated_info(self) -> dict[str, Any]:
         """Get updated information about the account.
 
         Returns:
-            Dict[str, Any]: Account information including remaining credits.
+            dict[str, Any]: Account information including remaining credits.
         """
         data = {"v": self.VERSION}
         body = {"data": data}
@@ -972,11 +973,11 @@ class Ilovepdf:  # pylint: disable=too-many-public-methods
         self.info = response.json()
         return self.info
 
-    def get_info(self) -> Dict[str, Any]:
+    def get_info(self) -> dict[str, Any]:
         """Get information about the account.
 
         Returns:
-            Dict[str, Any]: Account information.
+            dict[str, Any]: Account information.
         """
         return self.get_updated_info()
 

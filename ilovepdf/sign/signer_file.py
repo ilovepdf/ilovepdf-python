@@ -1,7 +1,5 @@
-"""Module containing the ReceiverAbstract class for handling receiver
+"""Module containing the SignerFile class for handling signer file
 information."""
-
-from typing import List, Optional
 
 from ilovepdf.abstract_task_element import AbstractTaskElement
 from ilovepdf.file import File
@@ -29,7 +27,7 @@ class SignerFile(AbstractTaskElement):
     }
     REQUIRED_FIELDS = ["server_filename", "elements"]
 
-    def __init__(self, file: Optional[File] = None):
+    def __init__(self, file: File | None = None):
         super().__init__()
         self._file = None
         if file:
@@ -69,7 +67,7 @@ class SignerFile(AbstractTaskElement):
 
     # Getters and Setters of elements
     @property
-    def elements(self) -> List[Element]:
+    def elements(self) -> list[Element]:
         """Get the list of elements associated with the file.
 
         Returns:
@@ -77,7 +75,7 @@ class SignerFile(AbstractTaskElement):
         """
         return self._get_attr("elements")
 
-    def add_element(self, element: Optional[Element] = None) -> Element:
+    def add_element(self, element: Element | None = None) -> Element:
         """Add an Element to the file's elements list.
 
         Args:

@@ -7,7 +7,6 @@ from ilovepdf.validators import IntValidator, StringValidator
 from .abstract_task_element import AbstractTaskElement
 
 
-# pylint: disable=too-few-public-methods
 class BaseFile(AbstractTaskElement):
     """Base class representing a base file managed by the iLovePDF API."""
 

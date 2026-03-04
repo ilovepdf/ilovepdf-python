@@ -22,5 +22,4 @@ class InvalidChoiceError(ValueError):
     """
 
     def __init__(self, message: str = "Value is not among the allowed choices."):
-        # pylint: disable=useless-super-delegation
         super().__init__(message)

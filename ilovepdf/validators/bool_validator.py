@@ -6,7 +6,6 @@ Provides the BoolValidator class to validate boolean inputs for tasks and models
 from ilovepdf.exceptions import InvalidChoiceError
 
 
-# pylint: disable=too-few-public-methods
 class BoolValidator:
     """Validates boolean values for input parameters.
 
@@ -38,6 +37,3 @@ class BoolValidator:
             raise InvalidChoiceError(
                 f"Invalid value for {param_name or 'boolean'}: must be a boolean."
             )
-
-
-# bool_validator = BoolValidator()

@@ -3,23 +3,32 @@
 Ensures that a value is of type str and/or is not an empty string.
 """
 
-from typing import Optional
-
 
 class StringValidator:
     """Validator for string values.
 
     Provides static methods to validate that a value is a string and/or not
     empty.
+
+    Methods:
+        validate_type:
+            Validates that the value is a string.
+
+        validate_not_empty:
+            Validates that the string is not empty.
+
+        validate:
+            Validates that the value is a non-empty string.
+
     """
 
     @staticmethod
-    def validate_type(value, param_name: Optional[str] = None) -> None:
+    def validate_type(value, param_name: str | None = None) -> None:
         """Validates that the value is a string.
 
         Args:
             value: The value to validate.
-            param_name (Optional[str]): The name of the parameter being validated.
+            param_name: Optional name of the parameter being validated.
 
         Raises:
             TypeError: If the value is not a string.
@@ -33,7 +42,7 @@ class StringValidator:
             raise TypeError("Value must be a string.")
 
     @staticmethod
-    def validate_not_empty(value: str, param_name: Optional[str] = None) -> None:
+    def validate_not_empty(value: str, param_name: str | None = None) -> None:
         """Validates that the string is not empty.
 
         Note:
@@ -43,7 +52,7 @@ class StringValidator:
 
         Args:
             value (str): The value to validate.
-            param_name (Optional[str]): The name of the parameter being
+            param_name: Optional name of the parameter being
                 validated.
 
         Raises:
@@ -60,12 +69,12 @@ class StringValidator:
             raise ValueError("Value must not be an empty string.")
 
     @staticmethod
-    def validate(value, param_name: Optional[str] = None) -> None:
+    def validate(value, param_name: str | None = None) -> None:
         """Validates that the value is a non-empty string.
 
         Args:
             value: The value to validate.
-            param_name (Optional[str]): The name of the parameter being validated.
+            param_name: Optional name of the parameter being validated.
 
         Raises:
             TypeError: If the value is not a string.

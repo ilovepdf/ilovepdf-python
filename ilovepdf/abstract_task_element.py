@@ -4,14 +4,14 @@ Provides base classes and utilities for serializing and validating payloads
 for API requests.
 """
 
-from typing import Any, Dict, Sequence
+from collections.abc import Sequence
+from typing import Any
 
 from ilovepdf.exceptions import MissingPayloadFieldError
 
-Payload = Dict[str, Any]
+Payload = dict[str, Any]
 
 
-# pylint: disable=too-few-public-methods
 class AbstractTaskElement:
     """Base class for task elements that can be serialized to an API payload.
 
@@ -51,7 +51,7 @@ class AbstractTaskElement:
 
     def __init__(self) -> None:
         self._payload: Payload = self._get_default_payload()
-        # self._payload: Payload = self._DEFAULT_PAYLOAD.copy()
+
         for key in self._LIST_ATTRS:
             if key in self._payload:
                 self._payload[key] = list(self._payload[key])
@@ -188,7 +188,7 @@ class AbstractTaskElement:
             if key not in data:
                 continue
             items = data[key]
-            if not isinstance(items, Sequence) or isinstance(items, (str, bytes)):
+            if not isinstance(items, Sequence) or isinstance(items, str | bytes):
                 continue
             serialized = []
             for item in items:

@@ -23,7 +23,6 @@ class NotAnIntError(TypeError):
     """
 
     def __init__(self, message: str = "Value must be of type int."):
-        # pylint: disable=useless-super-delegation
         super().__init__(message)
 
 
@@ -40,7 +39,6 @@ class InvalidIntValueError(ValueError):
     """
 
     def __init__(self, message: str = "Invalid integer value provided."):
-        # pylint: disable=useless-super-delegation
         super().__init__(message)
 
 
@@ -57,7 +55,6 @@ class IntOutOfRangeError(ValueError):
     """
 
     def __init__(self, message: str = "Value is outside the allowed range."):
-        # pylint: disable=useless-super-delegation
         super().__init__(message)
 
 
@@ -74,7 +71,6 @@ class NegativeIntError(ValueError):
     """
 
     def __init__(self, message: str = "Negative values are not permitted."):
-        # pylint: disable=useless-super-delegation
         super().__init__(message)
 
 
@@ -92,7 +88,6 @@ class ZeroIntError(ValueError):
     """
 
     def __init__(self, message: str = "Zero is not a valid value for this parameter."):
-        # pylint: disable=useless-super-delegation
         super().__init__(message)
 
 
@@ -111,5 +106,4 @@ class IntNotInAllowedSetError(ValueError):
     """
 
     def __init__(self, message: str = "Value is not in the allowed set."):
-        # pylint: disable=useless-super-delegation
         super().__init__(message)

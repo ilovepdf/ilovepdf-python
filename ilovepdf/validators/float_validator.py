@@ -4,7 +4,7 @@ Includes methods for type checking, positive validation, range validation,
 and allowed options validation for float values.
 """
 
-from typing import Any, Optional, Set
+from typing import Any
 
 from ilovepdf.exceptions import FloatOutOfRangeError, InvalidChoiceError
 
@@ -13,13 +13,13 @@ class FloatValidator:
     """Validator for float values with various constraints."""
 
     @staticmethod
-    def validate_type(value: Any, param_name: Optional[str] = None) -> None:
+    def validate_type(value: Any, param_name: str | None = None) -> None:
         """
         Validates that the value is a float.
 
         Args:
             value (float): The value to validate.
-            param_name (Optional[str]): The name of the parameter (for error messages).
+            param_name: Optional name of the parameter (for error messages).
 
         Raises:
             TypeError: If the value is not a float.
@@ -29,13 +29,13 @@ class FloatValidator:
             raise TypeError(f"Value{name} must be a float." + str(type(value)))
 
     @staticmethod
-    def validate_positive(value: float, param_name: Optional[str] = None) -> None:
+    def validate_positive(value: float, param_name: str | None = None) -> None:
         """
         Validates that the value is a positive float (> 0).
 
         Args:
             value (float): The value to validate.
-            param_name (Optional[str]): The name of the parameter (for error messages).
+            param_name: Optional name of the parameter (for error messages).
 
         Raises:
             FloatOutOfRangeError: If the value is not positive.
@@ -50,7 +50,7 @@ class FloatValidator:
         value: float,
         min_value: float,
         max_value: float,
-        param_name: Optional[str] = None,
+        param_name: str | None = None,
     ) -> None:
         """
         Validates that the value is within the specified range [min_value, max_value].
@@ -59,7 +59,7 @@ class FloatValidator:
             value (float): The value to validate.
             min_value (float): Minimum allowed value.
             max_value (float): Maximum allowed value.
-            param_name (Optional[str]): The name of the parameter (for error messages).
+            param_name: Optional name of the parameter (for error messages).
 
         Raises:
             FloatOutOfRangeError: If the value is outside the allowed range.
@@ -73,7 +73,7 @@ class FloatValidator:
 
     @staticmethod
     def validate_options(
-        value: float, options: Set[float], param_name: Optional[str] = None
+        value: float, options: set[float], param_name: str | None = None
     ) -> None:
         """
         Validates that the value is among the allowed options.
@@ -81,7 +81,7 @@ class FloatValidator:
         Args:
             value (float): The value to validate.
             options (Set[float]): Allowed float values.
-            param_name (Optional[str]): The name of the parameter (for error messages).
+            param_name: Optional name of the parameter (for error messages).
 
         Raises:
             InvalidChoiceError: If the value is not among the allowed options.

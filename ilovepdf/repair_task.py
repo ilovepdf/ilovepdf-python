@@ -3,8 +3,6 @@
 Provides the RepairTask class to fix corrupted PDF files.
 """
 
-# pylint: disable=abstract-method
-
 from .task import Task
 
 

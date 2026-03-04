@@ -3,8 +3,6 @@ Module for RotateTask in the iLovePDF Python API.
 Provides functionality to handle PDF rotation tasks.
 """
 
-# pylxint: disable=abstract-method
-
 from typing import Literal
 
 from .file import File

@@ -1,8 +1,5 @@
 """Module for handling Office to PDF conversion tasks in iLovePDF."""
 
-# pylint: disable=abstract-method
-
-
 from .exceptions import TooManyFilesError
 from .task import Task
 
