@@ -30,12 +30,12 @@ jobs:
         run: pip install -r requirements_test.txt
 
       - name: Validate global installation
-        run: bash .github/workflows/scripts/install_and_verify.sh global
+        run: bash .gitea/workflows/scripts/install_and_verify.sh global
 
       - name: Validate user installation
-        run: bash .github/workflows/scripts/install_and_verify.sh user
+        run: bash .gitea/workflows/scripts/install_and_verify.sh user
 
       - name: Validate VCS installation from current ref
         run: |
           pip install -U "git+${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}.git@${{ github.sha }}#egg=ilovepdf"
-          bash .github/workflows/scripts/install_and_verify.sh user
+          bash .gitea/workflows/scripts/install_and_verify.sh user

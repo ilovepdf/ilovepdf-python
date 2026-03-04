@@ -12,6 +12,7 @@ on:
 
 jobs:
   publish:
+    name: Publish
     runs-on: ubuntu-latest
     container:
       image: ghcr.io/catthehacker/ubuntu:act-latest
@@ -22,15 +23,23 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.10"
+      - name: Build and publish locally
+        run: bash .gitea/workflows/scripts/test-build-locally.sh
 
       - name: Build and publish
         env:
           TWINE_USERNAME: __token__
           TWINE_PASSWORD: ${{ secrets.TEST_PYPI_TOKEN }}
+          TEST_PYPI_ENABLED: ${{ vars.TEST_PYPI_ENABLED || 'false' }}
         run: |
           pip install build twine
           python -m build
-          twine upload --repository testpypi dist/*
+          if [ "$TEST_PYPI_ENABLED" = "true" ]; then
+            echo "Uploading to test.pypi.org..."
+            twine upload --verbose --repository testpypi dist/*
+          else
+            echo "Skipping test.pypi.org upload (TEST_PYPI_ENABLED=$TEST_PYPI_ENABLED)"
+          fi
 
       - name: Success
         run: |
@@ -40,3 +49,27 @@ jobs:
           echo "  pip install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple/ ilovepdf"
           echo ""
           echo "View at: https://test.pypi.org/project/ilovepdf/"
+
+  notify_failure:
+    name: Notify Failure
+    needs: [publish]
+    if: failure()
+    uses: ./.gitea/workflows/jobs/notify-telegram.yml
+    with:
+      result: "failure"
+      workflow_name: "Release to TestPyPI"
+    secrets:
+      TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+      TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+
+  notify_success:
+    name: Notify Success
+    needs: [publish]
+    if: success()
+    uses: ./.gitea/workflows/jobs/notify-telegram.yml
+    with:
+      result: "success"
+      workflow_name: "Release to TestPyPI"
+    secrets:
+      TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+      TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}

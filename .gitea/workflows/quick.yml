@@ -12,8 +12,6 @@ on:
       - "samples/**/*.py"
       - "*.py"
       - "pyproject.toml"
-      - "setup.py"
-      - "setup.cfg"
       - "requirements*.txt"
   pull_request:
     paths:
@@ -22,8 +20,6 @@ on:
       - "samples/**/*.py"
       - "*.py"
       - "pyproject.toml"
-      - "setup.py"
-      - "setup.cfg"
       - "requirements*.txt"
   workflow_dispatch:
 
@@ -44,3 +40,27 @@ jobs:
     uses: ./.gitea/workflows/jobs/unit-test.yml
     with:
       python-version: ${{ matrix.python-version }}
+
+  notify_failure:
+    name: Notify Failure
+    needs: [lint, unit_test]
+    if: failure()
+    uses: ./.gitea/workflows/jobs/notify-telegram.yml
+    with:
+      result: "failure"
+      workflow_name: "Quick CI"
+    secrets:
+      TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+      TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+
+  notify_success:
+    name: Notify Success
+    needs: [lint, unit_test]
+    if: success()
+    uses: ./.gitea/workflows/jobs/notify-telegram.yml
+    with:
+      result: "success"
+      workflow_name: "Quick CI"
+    secrets:
+      TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+      TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}

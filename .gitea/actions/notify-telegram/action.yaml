@@ -1,0 +1,21 @@
+name: "Notify Telegram"
+description: "Send a Telegram notification via bot"
+inputs:
+  telegram_token:
+    required: true
+    description: "Telegram Bot Token"
+  chat_id:
+    required: true
+    description: "Telegram Chat ID"
+  message:
+    required: true
+    description: "Message to send"
+runs:
+  using: "composite"
+  steps:
+    - name: Send Telegram notification
+      shell: bash
+      run: |
+        curl -s -X POST "https://api.telegram.org/bot${{ inputs.telegram_token }}/sendMessage" \
+          -d chat_id="${{ inputs.chat_id }}" \
+          -d text="${{ inputs.message }}"

@@ -32,3 +32,27 @@ jobs:
         run: |
           echo "✅ Published to PyPI"
           echo "Install: pip install ilovepdf"
+
+  notify_failure:
+    name: Notify Failure
+    needs: [publish]
+    if: failure()
+    uses: ./.gitea/workflows/jobs/notify-telegram.yml
+    with:
+      result: "failure"
+      workflow_name: "Release to PyPI"
+    secrets:
+      TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+      TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+
+  notify_success:
+    name: Notify Success
+    needs: [publish]
+    if: success()
+    uses: ./.gitea/workflows/jobs/notify-telegram.yml
+    with:
+      result: "success"
+      workflow_name: "Release to PyPI"
+    secrets:
+      TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+      TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}

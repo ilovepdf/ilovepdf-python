@@ -12,7 +12,7 @@ ENV PYTHONUNBUFFERED=1
 ENV PYTHONDONTWRITEBYTECODE=1
 
 # Copy project configuration files first (rarely change)
-COPY pyproject.toml setup.cfg ./
+COPY pyproject.toml ./
 COPY requirements.txt requirements_dev.txt requirements_test.txt ./
 
 # Upgrade pip and install test dependencies as root
@@ -22,7 +22,6 @@ RUN python -m pip install --upgrade pip && \
 # Copy source code and tests
 COPY ilovepdf ./ilovepdf
 COPY tests ./tests
-COPY pytest.ini ./
 
 # Install the package system-wide (non-editable) before switching to non-root
 RUN pip install .
@@ -57,4 +56,13 @@ assert ('site-packages' in p) or ('dist-packages' in p), \
 PY
 
 # Default command: run unit tests; integration requires API secrets to be provided
-CMD ["sh", "-c", "pytest tests/unit && pytest tests/integration"]
+CMD ["sh", "-c", "\
+    pytest tests/unit \
+        --cov=ilovepdf \
+        --cov-report=xml \
+        --cov-report=term \
+        --cov-fail-under=85 \
+        --timeout=30 \
+        -v \
+        --tb=short \
+    && pytest tests/integration"]

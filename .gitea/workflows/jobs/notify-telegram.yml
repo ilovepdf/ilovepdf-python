@@ -1,0 +1,36 @@
+name: Notify Telegram Job
+
+on:
+  workflow_call:
+    inputs:
+      result:
+        description: "Workflow result: 'success' or 'failure'"
+        required: true
+        type: string
+      workflow_name:
+        description: "Name of the calling workflow"
+        required: false
+        type: string
+        default: "CI"
+    secrets:
+      TELEGRAM_BOT_TOKEN:
+        required: true
+      TELEGRAM_CHAT_ID:
+        required: true
+
+jobs:
+  notify:
+    name: Telegram Notification
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Send notification
+        uses: ./.gitea/actions/notify-telegram
+        with:
+          telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
+          message: |
+            ${{ inputs.result == 'success' && '✅' || '❌' }} ${{ inputs.workflow_name }} ${{ inputs.result }} in ${{ github.repository }} on ${{ github.ref }}.
+            Check: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_number }}

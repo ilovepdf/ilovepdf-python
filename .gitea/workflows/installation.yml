@@ -15,3 +15,27 @@ jobs:
     uses: ./.gitea/workflows/jobs/installation.yml
     with:
       python-version: ${{ matrix.python-version }}
+
+  notify_failure:
+    name: Notify Failure
+    needs: [installation]
+    if: failure()
+    uses: ./.gitea/workflows/jobs/notify-telegram.yml
+    with:
+      result: "failure"
+      workflow_name: "Installation Validation"
+    secrets:
+      TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+      TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+
+  notify_success:
+    name: Notify Success
+    needs: [installation]
+    if: success()
+    uses: ./.gitea/workflows/jobs/notify-telegram.yml
+    with:
+      result: "success"
+      workflow_name: "Installation Validation"
+    secrets:
+      TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+      TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
