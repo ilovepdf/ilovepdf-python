@@ -16,12 +16,12 @@ file = my_task.add_file("/path/to/file/document.pdf")
 # Split the document into multiple parts based on defined page ranges
 my_task.ranges = "2-4,6-8"  # Each range will export as a separate document
 
+# Process files
+my_task.execute()
+
 # (Optional) Set name for each splitted PDF inside the zip (otherwise server names them)
 # Set output filename for advanced split result (ZIP)
 my_task.set_output_filename("split_advanced_result.zip")
-
-# Process files
-my_task.execute()
 
 # Download the zip to the output folder
 my_task.download("output_folder")

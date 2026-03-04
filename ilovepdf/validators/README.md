@@ -215,32 +215,19 @@ class ExampleTask:
 - No caching or memoization (validation is lightweight)
 - Suitable for frequent validation calls
 
-## Future Extensions
-
-Additional validators can be easily added following the same pattern:
-
-```python
-# Example: DateValidator (to be added)
-class DateValidator:
-    @staticmethod
-    def validate_in_range(value, min_date, max_date, param_name):
-        # Implementation
-        pass
-```
-
 ## Testing
 
 Each validator has comprehensive unit tests in `tests/unit/`:
 - `test_string_validator.py` - Tests for StringValidator
 - `test_int_validator.py` - Tests for IntValidator
-- `test_float_validator.py` - Tests for FloatValidator
-- `test_date_validator.py` - Tests for DateValidator
+- `test_bool_validator.py` - Tests for BoolValidator
 - `test_choice_validator.py` - Tests for ChoiceValidator
 
 Run tests with:
 ```bash
 pytest tests/unit/test_string_validator.py -v
 pytest tests/unit/test_int_validator.py -v
+pytest tests/unit/test_bool_validator.py -v
 pytest tests/unit/test_choice_validator.py -v
 ```
 
@@ -249,4 +236,3 @@ pytest tests/unit/test_choice_validator.py -v
 - `ilovepdf/abstract_task_element.py` - AbstractTaskElement base class
 - `ilovepdf/exceptions/` - Exception definitions
 - `tests/unit/` - Validator tests
-```

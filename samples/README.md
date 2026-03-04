@@ -24,22 +24,20 @@ Each script illustrates a specific task, such as compressing, splitting, convert
 
 Before running any example script:
 
-1. **Set environment variables**  
+1. **Set environment variables**
    Make sure you have set the required environment variables for authentication:
    - `ILOVEPDF_PUBLIC_KEY`
    - `ILOVEPDF_SECRET_KEY`
    - Optionally, `FOLDER_SAMPLE_PATH` for sample files
 
-   You can copy `.docker/.env.sample` to `.docker/.env` and fill in your credentials.
+   You can copy `.env.example` to `.env` and fill in your credentials.
 
-2. **Install dependencies**  
-   Install the library and its dependencies:
+2. **Install dependencies**
    ```bash
    pip install -r ../requirements.txt
    ```
 
-3. **Run the script**  
-   Execute any example script with:
+3. **Run the script**
    ```bash
    python <script_name>.py
    ```
@@ -59,11 +57,23 @@ Before running any example script:
 
 **Conversion**
 - `office_pdf_basic.py`: Convert an Office document (Excel, Word, PowerPoint) to PDF.
+- `html_to_pdf_basic.py`: Convert an HTML document to PDF.
 - `imagepdf_basic.py`: Convert images to PDF.
+- `pdftojpg_basic.py`: Convert a PDF file to JPG images (each page as a JPG or extract images).
 - `pdftopdfa_basic.py`: Convert a PDF to PDF/A.
 - `pdftopdfa_advanced.py`: Advanced PDF/A conversion options.
+- `validate_pdfa_basic.py`: Validate if a PDF is PDF/A compliant (no conversion).
 - `pdfocr_basic.py`: Perform OCR on a PDF with language configuration.
 - `extract_basic.py`: Extract text from a PDF.
+
+**Editing**
+- `editpdf_basic.py`: Basic EditPdfTask example that places a single text element on
+  the first page and downloads the updated PDF.
+- `editpdf_advanced.py`: Advanced EditPdfTask workflow combining text, image, and SVG
+  elements with custom styling and stacking order.
+
+**Merging**
+- `merge_basic.py`: Merge multiple PDF files into a single PDF.
 
 **Rotation**
 - `rotate_basic.py`: Rotate pages in a PDF file.
@@ -72,15 +82,19 @@ Before running any example script:
 - `watermark_basic.py`: Add a watermark (text or image) to a PDF.
 - `watermark_advanced.py`: Advanced watermarking with custom options.
 
+**Page Numbers**
+- `pagenumbers_basic.py`: Add page numbers to a PDF with customizable position, format, and appearance.
+
 **Signing**
 - `sign_basic.py`: Basic digital signature workflow.
 - `sign_advanced.py`: Advanced digital signature workflow with multiple receivers/elements.
 
+**Protection**
+- `protect_basic.py`: Add password protection to a PDF file.
+
 **Unlocking & Repair**
 - `unlock_basic.py`: Unlock a password-protected PDF.
 - `repair_basic.py`: Repair a corrupted PDF.
-
-_Note: All scripts conform to AGENT.md and core conventions. If a sample for a Task is missing, please contribute to maintain coverage and style compliance._
 
 ---
 
@@ -93,12 +107,7 @@ The `live/` subfolder contains scripts designed for **manual, real-world testing
 - Should be used for debugging, advanced validation, or when you need to verify the library in a real environment.
 - Must never include sensitive data or credentials directly in the code.
 
-**How to use:**
-1. Configure your environment variables or `.env` file with real API keys and sample files.
-2. Run the scripts manually as needed to validate real API flows.
-3. Review the `samples/live/README.md` for more details and usage instructions.
-
----
+For the full list of available live scripts, setup instructions, and usage details, see [`samples/live/README.md`](live/README.md).
 
 ---
 
@@ -106,5 +115,3 @@ The `live/` subfolder contains scripts designed for **manual, real-world testing
 
 - For full project documentation and API usage, see the [main README](../README.md).
 - For detailed API reference, visit the [official iLovePDF API docs](https://developer.ilovepdf.com/docs).
-
----

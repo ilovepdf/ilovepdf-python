@@ -1,4 +1,3 @@
-# pylint: disable=C0301
 """Live example: advanced PDF splitting using SplitTask.
 
 This script demonstrates splitting a PDF into multiple ranges.

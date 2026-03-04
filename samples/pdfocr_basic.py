@@ -20,9 +20,6 @@ file.ocr_languages = "spa"
 # Execute the OCR task
 my_task.execute()
 
-# Set the output filename for the processed file
-my_task.set_output_filename("document_ocr.pdf")
-
 # Set output filename for OCR PDF
 my_task.set_output_filename("pdfocr_basic_result.pdf")
 

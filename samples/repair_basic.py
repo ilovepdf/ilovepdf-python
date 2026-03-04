@@ -14,9 +14,6 @@ file = my_task.add_file("/path/to/file/document.pdf")
 # Process the task (repair the file)
 my_task.execute()
 
-# Set the output filename for the repaired file
-my_task.set_output_filename("document_repair.pdf")
-
 # Set output filename for repaired PDF
 my_task.set_output_filename("repair_basic_result.pdf")
 

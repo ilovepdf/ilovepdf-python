@@ -22,8 +22,5 @@ my_task.execute()
 # Set the output filename for the protected file
 my_task.set_output_filename("document_protect.pdf")
 
-# Set output filename for protected PDF
-my_task.set_output_filename("protect_basic_result.pdf")
-
 # Download the protected PDF to a folder
 my_task.download("output_folder")

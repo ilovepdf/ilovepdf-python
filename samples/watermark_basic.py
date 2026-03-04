@@ -25,9 +25,6 @@ my_task.text = "watermark text"
 my_task.execute()
 
 # Optionally, set the output filename
-my_task.set_output_filename("document_watermarked.pdf")
-
-# Set output filename for watermarked PDF
 my_task.set_output_filename("watermark_basic_result.pdf")
 
 # Download the watermarked file to a folder

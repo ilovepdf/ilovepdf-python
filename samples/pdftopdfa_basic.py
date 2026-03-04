@@ -20,10 +20,6 @@ my_task.conformance = "pdfa-2b"  # PDF/A conformance level
 # Process the task (convert PDFs to PDF/A)
 my_task.execute()
 
-# Optional
-# Set the output filename for the resulting file
-my_task.set_output_filename("documents_pdfa.pdf")
-
 # Set output filename for PDF/A result
 my_task.set_output_filename("pdftopdfa_basic_result.pdf")
 

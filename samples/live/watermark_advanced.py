@@ -1,4 +1,3 @@
-# pylint: disable=C0301
 """Live example: advanced watermarking using WatermarkTask.
 
 This script demonstrates adding a text watermark with custom options.

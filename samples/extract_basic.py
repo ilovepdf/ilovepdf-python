@@ -18,9 +18,6 @@ my_task.detailed = True
 # Process the task (extract text from PDF)
 my_task.execute()
 
-# Optional: set the output filename for the resulting text file
-my_task.set_output_filename("extracted_text.txt")
-
 # Set output filename for extracted text
 my_task.set_output_filename("extract_basic_result.txt")
 

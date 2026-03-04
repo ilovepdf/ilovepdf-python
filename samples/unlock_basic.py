@@ -1,4 +1,3 @@
-# pylint: disable=C0301
 """This module demonstrates a basic example of how to use the ilovepdf library
 to unlock a password-protected PDF file using the UnlockTask class."""
 
@@ -16,4 +15,4 @@ unlock_task.execute()
 
 # Set the output filename and download to the specified folder
 unlock_task.set_output_filename("sample_protected_mysecret_unlocked.pdf")
-unlock_task.download("/path/to/output")
+unlock_task.download("output_folder")

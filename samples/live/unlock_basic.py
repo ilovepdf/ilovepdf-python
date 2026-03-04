@@ -1,4 +1,3 @@
-# pylint: disable=C0301
 """Live example: unlock a password-protected PDF using UnlockTask.
 
 This script demonstrates how to use the ilovepdf library to remove password protection from a PDF file.
@@ -13,7 +12,9 @@ from ilovepdf import UnlockTask
 unlock_task = UnlockTask()
 
 # Add the password-protected PDF file from the integration samples folder
-file = unlock_task.add_file("tests/integration/files_samples/sample_protected_mysecret.pdf")
+file = unlock_task.add_file(
+    "tests/integration/files_samples/sample_protected_mysecret.pdf"
+)
 
 # Process the file to remove password protection
 unlock_task.execute()

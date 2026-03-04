@@ -20,12 +20,12 @@ my_task.ranges = "2-4,6-8"  # Each part becomes a separate file
 # Set that we want the splitted files to be merged into a single document
 my_task.merge_after = True
 
+# Process
+my_task.execute()
+
 # Set name for the output file (the merged result)
 # Set output filename for advanced split-merge result
 my_task.set_output_filename("split_advanced_merge_result.pdf")
-
-# Process
-my_task.execute()
 
 # Download the output to the output folder
 my_task.download("output_folder")

@@ -19,18 +19,22 @@ This folder contains the core Python source code for interacting with the iLoveP
 | `merge_task.py`            | Merge multiple PDF files into a single PDF.                      |
 | `office_pdf_task.py`       | Convert Office documents (Word, Excel, PowerPoint) to PDF.       |
 | `pdfocr_task.py`           | Perform OCR (Optical Character Recognition) on PDF files.        |
+| `pdftojpg_task.py`         | Convert PDF files to JPG images (pages or extract mode).         |
 | `pdftopdfa_task.py`        | Convert PDF files to PDF/A archival format.                      |
 | `protect_task.py`          | Add password protection and permissions to PDF files.            |
-| `removebackground_task.py` | Remove background from images in PDFs.                           |
-| `resize_task.py`           | Resize images within PDFs by width, height, or percentage.       |
+| `repair_task.py`           | Repair corrupted or damaged PDF files.                           |
 | `rotate_task.py`           | Rotate PDF pages by specified angles.                            |
 | `sign_task.py`             | Digitally sign PDF documents.                                    |
 | `split_task.py`            | Split PDF files into separate documents.                         |
 | `unlock_task.py`           | Remove password protection from PDF files.                       |
 | `watermark_task.py`        | Add text or image watermarks to PDFs.                            |
+| `pagenumbers_task.py`      | Add page numbers to PDFs with customizable appearance.           |
+| `editpdf_task.py`          | Add and position text, image, SVG, or bottom elements on PDFs.   |
+| `validate_pdfa_task.py`    | Validate PDF/A compliance of PDF files (no conversion).          |
 
 #### Other Modules
 
+- `helpers.py`: Helper functions and type definitions (literals, options).
 - `file.py`: File handling utilities for tasks.
 - `abstract_task_element.py`: AbstractTaskElement base class for task elements.
 - `ilovepdf_api.py`: Core API communication logic.
@@ -43,7 +47,7 @@ This folder contains the core Python source code for interacting with the iLoveP
 
 - Keep the code modular and well-documented.
 - Ensure all new modules and classes include appropriate docstrings (Google style, in English).
-- Any file ending with `*_task.py` must have corresponding unit and integration tests, as well as a sample script (see project root `AGENT.md` for details).
+- Any file ending with `*_task.py` must have corresponding unit and integration tests, as well as a sample script
 - Use type hints for all public methods and properties.
 - Follow PEP 8 and project-specific naming conventions.
 - Use the provided validators for input validation in tasks and models.
@@ -54,5 +58,7 @@ This folder contains the core Python source code for interacting with the iLoveP
 - [Samples and Usage](../samples/README.md)
 - [Testing](../tests/README.md)
 - [Docker and Environment Setup](../.docker/README.md)
+- [Installation](../INSTALL.md) - All install options
+- [Development](../DEVELOPMENT.md) - Contributing & setup
 
 For the official API documentation, visit: [iLovePDF API Docs](https://developer.ilovepdf.com/docs)

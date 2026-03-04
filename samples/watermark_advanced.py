@@ -60,5 +60,5 @@ my_task.set_output_filename("watermark_advanced_result.pdf")
 # process files
 my_task.execute()
 
-# Download the unlocked file to the output folder
+# Download the watermarked file to the output folder
 my_task.download("output_folder")

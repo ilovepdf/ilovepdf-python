@@ -20,8 +20,5 @@ my_task.execute()
 # Set the output filename for the rotated PDF.
 my_task.set_output_filename("document_rotated.pdf")
 
-# Set output filename for rotated PDF
-my_task.set_output_filename("rotate_basic_result.pdf")
-
 # Download the rotated PDF to a folder
 my_task.download("output_folder")

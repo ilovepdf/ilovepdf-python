@@ -39,14 +39,8 @@ my_task.remove_popups = True  # Remove popups from HTML
 # Process the task (convert HTML to PDF)
 my_task.execute()
 
-# Optional: set the output filename for the resulting PDF
+# Set output filename for HTML-to-PDF result
 my_task.set_output_filename("converted_html.pdf")
-
-# Set output filename for HTML-to-PDF result
-my_task.set_output_filename("html_to_pdf_basic_result.pdf")
-
-# Set output filename for HTML-to-PDF result
-my_task.set_output_filename("html_to_pdf_basic_result.pdf")
 
 # Download the HTML-to-PDF file to a folder
 my_task.download("output_folder")
