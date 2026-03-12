@@ -64,6 +64,21 @@ IntValidator.validate_options(90, {0, 90, 180, 270}, "rotation")  # OK
 IntValidator.validate_options(45, {0, 90, 180, 270}, "rotation")  # Raises IntNotInAllowedSetError
 ```
 
+### BoolValidator
+
+Validates that a value is strictly a boolean (`True` or `False`).
+
+**Methods:**
+- `validate(value, param_name)` - Ensure the value is a boolean; raises a `TypeError` if not.
+
+**Example:**
+```python
+from ilovepdf.validators import BoolValidator
+
+BoolValidator.validate(True, "flatten")  # OK
+BoolValidator.validate("true", "flatten")  # Raises TypeError
+```
+
 ### FloatValidator
 
 Validates float values with various constraints.
@@ -229,6 +244,11 @@ pytest tests/unit/test_string_validator.py -v
 pytest tests/unit/test_int_validator.py -v
 pytest tests/unit/test_bool_validator.py -v
 pytest tests/unit/test_choice_validator.py -v
+```
+
+To execute the validator-focused suite (including `BoolValidator`) in a single command:
+```bash
+pytest tests/unit/test_string_validator.py tests/unit/test_int_validator.py tests/unit/test_bool_validator.py tests/unit/test_choice_validator.py -v
 ```
 
 ## See Also

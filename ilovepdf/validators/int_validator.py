@@ -6,12 +6,12 @@ constraints (type, positive, range, options).
 
 from typing import Any
 
-from ilovepdf.exceptions import (
+from ..exceptions import (
     IntNotInAllowedSetError,
     IntOutOfRangeError,
     NotAnIntError,
 )
-from ilovepdf.validators.choice_validator import ChoiceValidator
+from . import ChoiceValidator
 
 
 class IntValidator:

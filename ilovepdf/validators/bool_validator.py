@@ -3,7 +3,7 @@
 Provides the BoolValidator class to validate boolean inputs for tasks and models.
 """
 
-from ilovepdf.exceptions import InvalidChoiceError
+from ..exceptions import InvalidChoiceError
 
 
 class BoolValidator:

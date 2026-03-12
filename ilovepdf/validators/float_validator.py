@@ -6,7 +6,7 @@ and allowed options validation for float values.
 
 from typing import Any
 
-from ilovepdf.exceptions import FloatOutOfRangeError, InvalidChoiceError
+from ..exceptions import FloatOutOfRangeError, InvalidChoiceError
 
 
 class FloatValidator:

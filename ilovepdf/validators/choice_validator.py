@@ -7,7 +7,7 @@ of allowed choices.
 from collections.abc import Iterable
 from typing import Any
 
-from ilovepdf.exceptions import InvalidChoiceError
+from ..exceptions import InvalidChoiceError
 
 
 class ChoiceValidator:
