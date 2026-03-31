@@ -128,3 +128,33 @@ For full Docker instructions, see [`.docker/README.md`](.docker/README.md).
 
 - Issues: https://github.com/ilovepdf/ilovepdf-python/issues
 - API Docs: https://developer.ilovepdf.com/docs
+
+## Versioning
+
+- The version is defined only in `pyproject.toml` → `[project].version`.
+
+Example: to bump from `1.0.1` to `1.0.2`, change in `pyproject.toml`:
+
+- `version = "1.0.1"` → `version = "1.0.2"`
+
+For a new release, just update the version in `pyproject.toml`.
+
+## Publishing to PyPI
+
+To publish a new version to PyPI:
+
+1. Update the version in `pyproject.toml`.
+2. Build the distributions:
+
+```bash
+pip install build twine
+python -m build
+```
+
+3. Upload to PyPI:
+
+```bash
+TWINE_USERNAME="__token__"
+TWINE_PASSWORD="<your PyPI token>"
+twine upload dist/*
+```
