@@ -1,7 +1,7 @@
 [project]
 name = "ilovepdf"
 description = "iLovePDF Python API"
-version = "0.0.1"
+version = "1.0.0"
 authors = [{ name = "ilovepdf", email = "developer@ilovepdf.com" }]
 license = "MIT"
 readme = "README.md"
@@ -10,7 +10,7 @@ requires-python = ">=3.10"
 dependencies = ["requests>=2.28.0", "pyjwt>=2.4.0", "python-dotenv>=1.0.0"]
 
 classifiers = [
-    "Development Status :: 3 - Alpha",
+    "Development Status :: 5 - Production/Stable",
     "Intended Audience :: Developers",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.10",
