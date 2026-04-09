@@ -30,7 +30,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install pre-commit
+          pip install -r requirements_test.txt
           pip install -e .
 
       - name: Run all linters via pre-commit
