@@ -20,6 +20,7 @@ from .protect_task import ProtectTask
 from .repair_task import RepairTask
 from .rotate_task import RotateTask
 from .sign_task import SignTask
+from .smart_split_task import SmartSplitTask
 from .split_task import SplitTask
 from .task import Task
 from .unlock_task import UnlockTask
@@ -44,6 +45,7 @@ __all__ = [
     "RepairTask",
     "RotateTask",
     "SignTask",
+    "SmartSplitTask",
     "SplitTask",
     "UnlockTask",
     "WatermarkTask",

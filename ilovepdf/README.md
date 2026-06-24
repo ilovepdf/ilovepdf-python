@@ -25,6 +25,7 @@ This folder contains the core Python source code for interacting with the iLoveP
 | `repair_task.py`           | Repair corrupted or damaged PDF files.                           |
 | `rotate_task.py`           | Rotate PDF pages by specified angles.                            |
 | `sign_task.py`             | Digitally sign PDF documents.                                    |
+| `smart_split_task.py`      | AI-powered smart PDF splitting based on content analysis.        |
 | `split_task.py`            | Split PDF files into separate documents.                         |
 | `unlock_task.py`           | Remove password protection from PDF files.                       |
 | `watermark_task.py`        | Add text or image watermarks to PDFs.                            |

@@ -54,6 +54,7 @@ Before running any example script:
 - `split_basic.py`: Split a PDF into separate pages.
 - `split_advanced.py`: Advanced splitting with custom ranges or split modes.
 - `split_advanced_merge.py`: Split a PDF and then merge selected pages.
+- `smart_split_basic.py`: AI-powered smart split based on content analysis.
 
 **Conversion**
 - `office_pdf_basic.py`: Convert an Office document (Excel, Word, PowerPoint) to PDF.

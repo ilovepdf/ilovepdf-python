@@ -47,6 +47,9 @@ Unit tests are designed to verify the correctness of individual functions, class
 - `test_signer_file.py` - SignerFile file and element management for signature tasks
 - `test_sign_signer.py` - Signer signer type, access code, and file association
 - `test_split_task.py` - SplitTask split modes, parameter validation, and payload
+- `test_smart_split_task.py` - SmartSplitTask prompt validation, required-field enforcement, and default payload
+- `test_summarize_task.py` - SummarizeTask language and output_format validation
+- `test_translate_task.py` - TranslateTask language and output_format validation
 - `test_unlock_task.py` - UnlockTask basic instantiation and payload
 - `test_watermark_task.py` - WatermarkTask watermarking features
 - `test_pagenumbers_task.py` - PageNumbersTask page numbering features, validation, and appearance options

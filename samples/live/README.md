@@ -92,6 +92,7 @@ All live scripts must remain minimal:
 | `split_basic.py`            | Splits `sample.pdf` by ranges (`2-4,6-8`) and downloads a ZIP with results.    |
 | `split_advanced.py`         | Advanced PDF splitting with custom ranges and options.                          |
 | `split_advanced_merge.py`   | Splits `sample.pdf` by ranges and merges results into a single PDF.            |
+| `smart_split_basic.py`      | AI-powered smart split using `SmartSplitTask` with prompt guidance.             |
 
 ### Conversion
 
