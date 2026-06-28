@@ -45,6 +45,7 @@ pytest tests/integration
 | test_integration_unlock_task.py             | Integration tests for UnlockTask, removing password protection from PDFs.                     |
 | test_integration_watermark_task.py          | Integration tests for WatermarkTask, adding text or image watermarks to PDFs.                 |
 | test_integration_pagenumbers_task.py        | Integration tests for PageNumbersTask, adding page numbers to PDFs with customizable appearance and format. |
+| test_integration_pdfmarkdown_task.py        | Integration tests for PdfMarkdownTask, converting PDF files to Markdown format.                                    |
 | test_integration_editpdf_task.py            | Integration tests for EditPdfTask, covering text, image, and SVG elements plus execute/download workflows. |
 
 Update this table as new integration tests are added.

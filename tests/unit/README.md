@@ -55,6 +55,7 @@ Unit tests are designed to verify the correctness of individual functions, class
 - `test_pagenumbers_task.py` - PageNumbersTask page numbering features, validation, and appearance options
 - `test_editpdf_element.py` - EditPdfTask element setters, payload validation, and file upload helpers
 - `test_editpdf_task.py` - EditPdfTask end-to-end task configuration and execute/download workflow
+- `test_pdfmarkdown_task.py` - PdfMarkdownTask initialization and default payload
 - `test_pdftojpg_task.py` - PdfToJpgTask PDF to JPG conversion mode validation and payload
 
 ### Validators

@@ -13,6 +13,7 @@ from .imagepdf_task import ImagePdfTask
 from .merge_task import MergeTask
 from .office_pdf_task import OfficePdfTask
 from .pagenumbers_task import PageNumbersTask
+from .pdfmarkdown_task import PdfMarkdownTask
 from .pdfocr_task import PdfOcrTask
 from .pdftojpg_task import PdfToJpgTask
 from .pdftopdfa_task import PdfToPdfATask
@@ -40,6 +41,7 @@ __all__ = [
     "MergeTask",
     "OfficePdfTask",
     "PdfToPdfATask",
+    "PdfMarkdownTask",
     "PdfOcrTask",
     "ProtectTask",
     "RepairTask",

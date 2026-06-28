@@ -18,6 +18,7 @@ This folder contains the core Python source code for interacting with the iLoveP
 | `imagepdf_task.py`         | Convert images to PDF format.                                    |
 | `merge_task.py`            | Merge multiple PDF files into a single PDF.                      |
 | `office_pdf_task.py`       | Convert Office documents (Word, Excel, PowerPoint) to PDF.       |
+| `pdfmarkdown_task.py`     | Convert PDF files to Markdown format.                            |
 | `pdfocr_task.py`           | Perform OCR (Optical Character Recognition) on PDF files.        |
 | `pdftojpg_task.py`         | Convert PDF files to JPG images (pages or extract mode).         |
 | `pdftopdfa_task.py`        | Convert PDF files to PDF/A archival format.                      |

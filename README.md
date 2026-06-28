@@ -8,7 +8,7 @@ A Python library for [iLovePDF API](https://developer.ilovepdf.com) to automate 
 
 You can sign up for an iLovePDF account at https://developer.ilovepdf.com
 
-Develop and automate PDF processing tasks like Compress PDF, Merge PDF, Split PDF, convert Office to PDF, PDF to JPG, Images to PDF, add Page Numbers, Rotate PDF, Unlock PDF, stamp a Watermark and Repair PDF. Each one with several settings to get your desired results.
+Develop and automate PDF processing tasks like Compress PDF, Merge PDF, Split PDF, convert Office to PDF, PDF to JPG, PDF to Markdown, Images to PDF, add Page Numbers, Rotate PDF, Unlock PDF, stamp a Watermark and Repair PDF. Each one with several settings to get your desired results.
 
 ## Requirements
 

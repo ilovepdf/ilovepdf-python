@@ -66,6 +66,7 @@ Before running any example script:
 - `validate_pdfa_basic.py`: Validate if a PDF is PDF/A compliant (no conversion).
 - `pdfocr_basic.py`: Perform OCR on a PDF with language configuration.
 - `extract_basic.py`: Extract text from a PDF.
+- `pdfmarkdown_basic.py`: Convert a PDF file to Markdown format.
 
 **Editing**
 - `editpdf_basic.py`: Basic EditPdfTask example that places a single text element on
