@@ -37,6 +37,9 @@ pythonpath = ["ilovepdf"]
 testpaths = ["tests"]
 python_files = ["test_*.py", "*_test.py"]
 addopts = "--color=yes -vv --reruns 1 --reruns-delay 3 --tb=short"
+filterwarnings = [
+    "ignore:Class-scoped fixture defined as instance method:pytest.PytestRemovedIn10Warning",
+]
 log_cli = true
 log_cli_level = "INFO"
 
