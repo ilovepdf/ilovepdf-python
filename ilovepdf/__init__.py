@@ -23,6 +23,7 @@ from .rotate_task import RotateTask
 from .sign_task import SignTask
 from .smart_split_task import SmartSplitTask
 from .split_task import SplitTask
+from .summarize_task import SummarizeTask
 from .task import Task
 from .unlock_task import UnlockTask
 from .validate_pdfa_task import ValidatePdfATask
@@ -49,6 +50,7 @@ __all__ = [
     "SignTask",
     "SmartSplitTask",
     "SplitTask",
+    "SummarizeTask",
     "UnlockTask",
     "WatermarkTask",
     "PdfToJpgTask",

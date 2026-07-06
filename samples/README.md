@@ -68,9 +68,10 @@ Before running any example script:
 - `extract_basic.py`: Extract text from a PDF.
 - `pdfmarkdown_basic.py`: Convert a PDF file to Markdown format.
 
+**AI Features**
+- `summarize_basic.py`: Generate an AI-powered summary of a PDF document.
+
 **Editing**
-- `editpdf_basic.py`: Basic EditPdfTask example that places a single text element on
-  the first page and downloads the updated PDF.
 - `editpdf_advanced.py`: Advanced EditPdfTask workflow combining text, image, and SVG
   elements with custom styling and stacking order.
 
@@ -91,12 +92,12 @@ Before running any example script:
 - `sign_basic.py`: Basic digital signature workflow.
 - `sign_advanced.py`: Advanced digital signature workflow with multiple receivers/elements.
 
-**Protection**
+**Protection & Repair**
 - `protect_basic.py`: Add password protection to a PDF file.
-
-**Unlocking & Repair**
-- `unlock_basic.py`: Unlock a password-protected PDF.
 - `repair_basic.py`: Repair a corrupted PDF.
+
+**Unlocking**
+- `unlock_basic.py`: Unlock a password-protected PDF.
 
 ---
 

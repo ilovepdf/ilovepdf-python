@@ -42,11 +42,13 @@ pytest tests/integration
 | test_integration_sign_basic_task.py         | Integration tests for SignTask, digital signature workflows.                                  |
 | test_integration_split_task.py              | Integration tests for SplitTask, splitting PDFs by range, pages, or size.                     |
 | test_integration_smart_split_task.py      | Integration tests for SmartSplitTask, AI-powered PDF splitting.                        |
+| test_integration_summarize_task.py          | Integration tests for SummarizeTask, AI-powered PDF summarization in multiple languages and formats. |
 | test_integration_unlock_task.py             | Integration tests for UnlockTask, removing password protection from PDFs.                     |
 | test_integration_watermark_task.py          | Integration tests for WatermarkTask, adding text or image watermarks to PDFs.                 |
 | test_integration_pagenumbers_task.py        | Integration tests for PageNumbersTask, adding page numbers to PDFs with customizable appearance and format. |
 | test_integration_pdfmarkdown_task.py        | Integration tests for PdfMarkdownTask, converting PDF files to Markdown format.                                    |
 | test_integration_editpdf_task.py            | Integration tests for EditPdfTask, covering text, image, and SVG elements plus execute/download workflows. |
+| test_integration_summarize_task.py          | Integration tests for SummarizeTask, AI-powered PDF summarization in multiple languages and formats.   |
 
 Update this table as new integration tests are added.
 

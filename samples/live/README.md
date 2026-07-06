@@ -93,6 +93,7 @@ All live scripts must remain minimal:
 | `split_advanced.py`         | Advanced PDF splitting with custom ranges and options.                          |
 | `split_advanced_merge.py`   | Splits `sample.pdf` by ranges and merges results into a single PDF.            |
 | `smart_split_basic.py`      | AI-powered smart split using `SmartSplitTask` with prompt guidance.             |
+| `summarize_basic.py`       | AI-powered PDF summarization using `SummarizeTask` with language options.       |
 
 ### Conversion
 
@@ -159,6 +160,12 @@ All live scripts must remain minimal:
 | ----------------------- | ----------------------------------------------------------------------------------- |
 | `protect_basic.py`      | Adds password protection to `sample.pdf` using `ProtectTask`.                      |
 | `unlock_basic.py`       | Removes password protection from a PDF using `UnlockTask`.                         |
+
+### AI Features
+
+| Script                  | Description                                                                         |
+| ----------------------- | ----------------------------------------------------------------------------------- |
+| `summarize_basic.py`    | AI-powered PDF summarization with language and format options.                      |
 
 ### Repair
 
