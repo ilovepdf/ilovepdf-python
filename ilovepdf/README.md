@@ -28,6 +28,7 @@ This folder contains the core Python source code for interacting with the iLoveP
 | `sign_task.py`             | Digitally sign PDF documents.                                    |
 | `smart_split_task.py`      | AI-powered smart PDF splitting based on content analysis.        |
 | `summarize_task.py`        | AI-powered PDF summarization in multiple languages and formats.   |
+| `translate_task.py`         | AI-powered PDF translation to multiple target languages.           |
 | `split_task.py`            | Split PDF files into separate documents.                         |
 | `unlock_task.py`           | Remove password protection from PDF files.                       |
 | `watermark_task.py`        | Add text or image watermarks to PDFs.                            |

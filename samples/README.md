@@ -70,6 +70,8 @@ Before running any example script:
 
 **AI Features**
 - `summarize_basic.py`: Generate an AI-powered summary of a PDF document.
+- `translate_basic.py`: Translate a PDF document to another language.
+- `translate_advanced.py`: Advanced PDF translation to another language.
 
 **Editing**
 - `editpdf_advanced.py`: Advanced EditPdfTask workflow combining text, image, and SVG

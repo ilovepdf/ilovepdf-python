@@ -43,6 +43,7 @@ pytest tests/integration
 | test_integration_split_task.py              | Integration tests for SplitTask, splitting PDFs by range, pages, or size.                     |
 | test_integration_smart_split_task.py      | Integration tests for SmartSplitTask, AI-powered PDF splitting.                        |
 | test_integration_summarize_task.py          | Integration tests for SummarizeTask, AI-powered PDF summarization in multiple languages and formats. |
+| test_integration_translate_task.py           | Integration tests for TranslateTask, AI-powered PDF translation to multiple target languages.         |
 | test_integration_unlock_task.py             | Integration tests for UnlockTask, removing password protection from PDFs.                     |
 | test_integration_watermark_task.py          | Integration tests for WatermarkTask, adding text or image watermarks to PDFs.                 |
 | test_integration_pagenumbers_task.py        | Integration tests for PageNumbersTask, adding page numbers to PDFs with customizable appearance and format. |

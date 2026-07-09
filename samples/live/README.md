@@ -166,6 +166,7 @@ All live scripts must remain minimal:
 | Script                  | Description                                                                         |
 | ----------------------- | ----------------------------------------------------------------------------------- |
 | `summarize_basic.py`    | AI-powered PDF summarization with language and format options.                      |
+| `translate_basic.py`    | AI-powered PDF translation to another language.                                      |
 
 ### Repair
 

@@ -25,6 +25,7 @@ from .smart_split_task import SmartSplitTask
 from .split_task import SplitTask
 from .summarize_task import SummarizeTask
 from .task import Task
+from .translate_task import TranslateTask
 from .unlock_task import UnlockTask
 from .validate_pdfa_task import ValidatePdfATask
 from .watermark_task import WatermarkTask
@@ -51,6 +52,7 @@ __all__ = [
     "SmartSplitTask",
     "SplitTask",
     "SummarizeTask",
+    "TranslateTask",
     "UnlockTask",
     "WatermarkTask",
     "PdfToJpgTask",
