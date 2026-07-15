@@ -5,7 +5,7 @@ This example demonstrates how to use the SignTask class with multiple signers.
 Applies supported API: no custom elements, receivers or brand/logo signatures (those
 features aren't available in the public Python SDK as of now).
 
-For updated API docs, see: https://developer.ilovepdf.com/docs/api-reference/sign
+For updated API docs, see: https://www.iloveapi.com/docs/api-reference#create-signature
 """
 
 from ilovepdf import SignTask

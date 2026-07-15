@@ -3,7 +3,7 @@
 MergeTask allows you to combine multiple PDFs into a single file. Simply initialize,
 add files, execute, and download.
 
-https://developer.ilovepdf.com/docs/api-reference/merge-pdf
+https://www.iloveapi.com/docs/api-reference#merge-extra-parameters
 """
 
 from ilovepdf import MergeTask

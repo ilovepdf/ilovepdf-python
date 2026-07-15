@@ -5,7 +5,7 @@ Demonstrates how to use the SignTask class to digitally sign a PDF document usin
 iLovePDF API. Due to current API limitations, only basic signer definition is shown (no
 custom elements).
 
-For API docs, see: https://developer.ilovepdf.com/docs/api-reference/sign
+For API docs, see: https://www.iloveapi.com/docs/api-reference#create-signature
 """
 
 from ilovepdf import SignTask

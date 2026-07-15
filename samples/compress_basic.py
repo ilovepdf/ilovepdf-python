@@ -8,7 +8,7 @@ Example:
     my_task.compression_level = "low"  # Set to smallest size, lowest quality
 
 For more info, see:
-https://developer.ilovepdf.com/docs/api-reference/compress-pdf
+https://www.iloveapi.com/docs/api-reference#compress-extra-parameters
 """
 
 from ilovepdf import CompressTask

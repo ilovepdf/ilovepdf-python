@@ -4,7 +4,7 @@ This script demonstrates WatermarkTask with minimal configuration for adding a t
 watermark.
 
 Valid modes: "text", "image". See documentation for all options.
-https://developer.ilovepdf.com/docs/api-reference/watermark-pdf
+https://www.iloveapi.com/docs/api-reference#watermark-extra-parameters
 """
 
 from ilovepdf import WatermarkTask

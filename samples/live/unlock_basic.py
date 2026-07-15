@@ -3,7 +3,7 @@
 This script demonstrates how to use the ilovepdf library to remove password protection from a PDF file.
 Replace credentials and file paths with your own values for a real test.
 
-For API documentation, see: https://developer.ilovepdf.com/docs/api-reference/unlock
+For API documentation, see: https://www.iloveapi.com/docs/api-reference#unlock-extra-parameters
 """
 
 from ilovepdf import UnlockTask

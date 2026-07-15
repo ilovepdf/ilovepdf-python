@@ -3,7 +3,7 @@
 Demonstrates how to split a PDF into custom ranges and merge the results
 into a single document using SplitTask properties.
 
-For details, see: https://developer.ilovepdf.com/docs/api-reference/split-pdf
+For details, see: https://www.iloveapi.com/docs/api-reference#split-extra-parameters
 """
 
 from ilovepdf import SplitTask

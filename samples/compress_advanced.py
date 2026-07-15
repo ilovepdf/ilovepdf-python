@@ -7,7 +7,7 @@ This script also shows how to set a custom output filename and download
 to a specific folder.
 
 See:
-https://developer.ilovepdf.com/docs/api-reference/compress-pdf
+https://www.iloveapi.com/docs/api-reference#compress-extra-parameters
 """
 
 from ilovepdf import CompressTask

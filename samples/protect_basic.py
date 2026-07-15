@@ -2,7 +2,7 @@
 
 Demonstrates setting a password to encrypt a PDF using the ProtectTask
 with the correct (property-based) API.
-https://developer.ilovepdf.com/docs/api-reference/protect-pdf
+https://www.iloveapi.com/docs/api-reference#protect-extra-parameters
 """
 
 from ilovepdf import ProtectTask

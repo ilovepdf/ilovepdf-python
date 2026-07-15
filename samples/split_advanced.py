@@ -1,8 +1,7 @@
 """Advanced PDF split example using iLovePDF Python SDK.
 
-Demonstrates splitting a PDF into custom page ranges, and setting output filename.
-API supports using properties instead of set_XXX methods. For more advanced options,
-see SplitTask docstring and https://developer.ilovepdf.com/docs/api-reference/split-pdf
+Demonstrates splitting a PDF into custom page ranges and setting a custom output filename.
+For more advanced options, see SplitTask docstring and https://www.iloveapi.com/docs/api-reference#split-extra-parameters
 """
 
 from ilovepdf import SplitTask
