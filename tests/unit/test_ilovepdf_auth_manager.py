@@ -1,10 +1,14 @@
 """Unit tests for the IlovepdfAuthManager class in the ilovepdf module."""
 
+import jwt
 import pytest
 from pytest_mock import MockerFixture
 
 from ilovepdf.exceptions.auth_exception import AuthException
 from ilovepdf.ilovepdf_api import Ilovepdf
+
+VALID_SECRET_KEY = "dummy_secret_key_that_is_long_enough_for_hs256"
+INVALID_SECRET_KEY = "bad_secret_key_that_is_long_enough_for_hs256"
 
 
 class IlovepdfAuthManager:
@@ -16,7 +20,7 @@ class IlovepdfAuthManager:
     def __init__(self, public_key: str | None = None, secret_key: str | None = None):
         # Always provide a non-empty secret_key for testing purposes if not given
         public_key = public_key or "dummy_key"
-        secret_key = secret_key or "dummy_secret"
+        secret_key = secret_key or VALID_SECRET_KEY
         self._ilovepdf = Ilovepdf(public_key=public_key, secret_key=secret_key)
 
     def set_credentials(
@@ -51,31 +55,34 @@ class TestIlovepdfAuthManager:
         assert manager.get_secret_key() == "sec_key"
 
     def test_get_token(self, mocker: MockerFixture):
-        mock_request = mocker.patch("requests.request")
-        mock_response = mocker.MagicMock()
-        mock_response.json.return_value = {"token": "token_cache"}
-        mock_response.status_code = 200
-        mock_request.return_value = mock_response
+        """Check that get_token returns a self-signed JWT."""
+        mock_request = mocker.patch(
+            "requests.request", side_effect=RuntimeError("network should not be used")
+        )
 
-        manager = IlovepdfAuthManager(public_key="pub_key", secret_key="dummy_secret")
+        manager = IlovepdfAuthManager(public_key="pub_key")
         token = manager.get_token()
-        assert token == "token_cache"
-        assert manager.token_actual() == "token_cache"
+
+        assert isinstance(token, str)
+        payload = jwt.decode(token, VALID_SECRET_KEY, algorithms=["HS256"])
+        assert payload["jti"] == "pub_key"
+        assert manager.token_actual() == token
+        mock_request.assert_not_called()
 
     def test_token_is_reusable(self, mocker: MockerFixture):
-        mock_request = mocker.patch("requests.request")
-        mock_response = mocker.MagicMock()
-        mock_response.json.return_value = {"token": "token_cache"}
-        mock_response.status_code = 200
-        mock_request.return_value = mock_response
+        """Check that the locally generated token is cached and reused."""
+        mock_request = mocker.patch(
+            "requests.request", side_effect=RuntimeError("network should not be used")
+        )
 
-        manager = IlovepdfAuthManager(public_key="pub_key", secret_key="dummy_secret")
+        manager = IlovepdfAuthManager(public_key="pub_key")
         token1 = manager.get_token()
         token2 = manager.get_token()
-        assert token1 == token2 == "token_cache"
-        mock_request.assert_called_once()
+        assert token1 == token2
+        mock_request.assert_not_called()
 
     def test_invalid_credentials_raise_exception(self, mocker: MockerFixture):
+        """Check that invalid credentials fail on a real API call."""
         mock_request = mocker.patch("requests.request")
         mock_response = mocker.MagicMock()
         mock_response.status_code = 401
@@ -88,14 +95,18 @@ class TestIlovepdfAuthManager:
         }
         mock_request.return_value = mock_response
 
-        manager = IlovepdfAuthManager(public_key="bad", secret_key="bad")
+        manager = IlovepdfAuthManager(public_key="bad", secret_key=INVALID_SECRET_KEY)
         with pytest.raises(AuthException):
-            manager.get_token()
+            manager._ilovepdf.send_request("get", "start/compress", start=True)
 
-    def test_connection_error_raises_exception(self, mocker: MockerFixture):
-        mock_request = mocker.patch("requests.request")
-        mock_request.side_effect = Exception("Connection error")
-        manager = IlovepdfAuthManager(public_key="public", secret_key="secret")
-        with pytest.raises(Exception) as excinfo:
-            manager.get_token()
-        assert "Connection error" in str(excinfo.value)
+    def test_connection_error_does_not_break_token_generation(
+        self, mocker: MockerFixture
+    ):
+        """Check that token generation works even when the network is down."""
+        mock_request = mocker.patch(
+            "requests.request", side_effect=Exception("Connection error")
+        )
+        manager = IlovepdfAuthManager(public_key="public")
+        token = manager.get_token()
+        assert isinstance(token, str)
+        mock_request.assert_not_called()

@@ -19,6 +19,7 @@ Unit tests are designed to verify the correctness of individual functions, class
 - `test_ilovepdf.py` - Ilovepdf core class and API initialization
 - `test_ilovepdf_auth_manager.py` - Authentication manager and credential handling
 - `test_error_router.py` - ErrorRouter error handling and exception routing
+- `test_library_version.py` - Library version reporting and propagation to request payloads
 
 ### Core Classes
 

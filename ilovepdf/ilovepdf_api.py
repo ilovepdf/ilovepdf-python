@@ -52,9 +52,7 @@ HTTP_OK = 200
 HTTP_CREATED = 201
 HTTP_BAD_REQUEST = 400
 HTTP_UNAUTHORIZED = 401
-HTTP_FORBIDDEN = 403
 HTTP_TOO_MANY_REQUESTS = 429
-HTTP_INTERNAL_SERVER_ERROR = 500
 
 # Endpoints requiring large timeout
 LARGE_TIMEOUT_ENDPOINTS = ["process", "upload"]
@@ -608,15 +606,15 @@ class Ilovepdf:
     def get_token(self) -> str:
         """Get the JWT token for API authentication.
 
-        Retrieves a cached token if still valid, otherwise requests a new
-        token from the API. Falls back to local JWT generation if API fails.
+        Generates a self-signed JWT locally using the project's secret key,
+        which is the recommended method for server-side integrations. The
+        token is cached and reused until it nears expiration.
 
         Returns:
             str: Valid JWT authentication token.
 
         Raises:
             ValueError: If secret_key is not a non-empty string.
-            AuthException: If authentication with the API fails.
         """
         self._validate_api_key(self.auth.secret_key, "secret_key")
 
@@ -627,19 +625,6 @@ class Ilovepdf:
             self.auth.token = token
             return token
 
-        # Try to get token from API
-        try:
-            token = self._request_token_from_api()
-            self._cache_token(token)
-            return token
-        except requests.RequestException as exc:
-            _logger.warning(
-                "Failed to get token from API (%s), "
-                "falling back to local JWT generation.",
-                exc,
-            )
-
-        # Fallback: generate local JWT
         token = self._generate_local_jwt()
         self._cache_token(token)
         return token
@@ -656,59 +641,6 @@ class Ilovepdf:
         current_time = int(datetime.now(timezone.utc).timestamp())
         return exp - TOKEN_CACHE_BUFFER_SECONDS > current_time
 
-    def _request_token_from_api(self) -> str:
-        """Request a new token from the iLovePDF API.
-
-        Returns:
-            str: JWT token from the API.
-
-        Raises:
-            AuthException: If authentication fails or response is invalid.
-        """
-        url = f"{self.get_start_server()}/{API_VERSION}/auth"
-        headers = {"Accept": "application/json"}
-        data = {"public_key": self.get_public_key()}
-
-        response = requests.request(
-            "POST",
-            url,
-            json=data,
-            headers=headers,
-            timeout=self.server.timeout,
-        )
-
-        if response.status_code in (HTTP_OK, HTTP_CREATED):
-            response_json = response.json()
-            token = response_json.get("token")
-            if token:
-                return token
-            raise KeyError("Token not found in response")
-
-        # Handle error responses
-        response_json = self._response_handler.parse_json(response)
-
-        if response.status_code == HTTP_UNAUTHORIZED:
-            raise AuthException(
-                response_json.get("error", {}).get("type", "Auth error"),
-                response_json,
-                response.status_code,
-            )
-
-        if response.status_code in (
-            HTTP_BAD_REQUEST,
-            HTTP_FORBIDDEN,
-            HTTP_INTERNAL_SERVER_ERROR,
-        ):
-            raise AuthException(
-                response_json.get("error", {}).get("type", "Auth error"),
-                response_json,
-                response.status_code,
-            )
-
-        raise AuthException(
-            response_json.get("error", {}).get("message", "Auth failed")
-        )
-
     def _generate_local_jwt(self) -> str:
         """Generate a JWT token locally.
 
@@ -720,8 +652,8 @@ class Ilovepdf:
         exp = now + TOKEN_EXPIRE_SECONDS + delay
 
         payload = {
-            "iss": API_HOST,
-            "aud": API_HOST,
+            "iss": "",
+            "aud": "",
             "iat": now - delay,
             "nbf": now - delay,
             "exp": exp,
@@ -737,11 +669,15 @@ class Ilovepdf:
     def _cache_token(self, token: str) -> None:
         """Cache a token with its expiration time.
 
+        The cache expiration is based on the API's one-hour token lifetime,
+        not on the local clock-skew delay. This prevents the use of stale
+        tokens once the real expiration time has passed.
+
         Args:
             token (str): The JWT token to cache.
         """
         now = int(datetime.now(timezone.utc).timestamp())
-        exp = now + TOKEN_EXPIRE_SECONDS + self.server.time_delay
+        exp = now + TOKEN_EXPIRE_SECONDS
         self.auth.token_cache = (token, exp)
         self.auth.token = token
 
@@ -756,8 +692,8 @@ class Ilovepdf:
 
         current_time = int(time.time())
         token_dict: dict[str, int | str | None] = {
-            "iss": API_HOST,
-            "aud": API_HOST,
+            "iss": "",
+            "aud": "",
             "iat": current_time - self.server.time_delay,
             "nbf": current_time - self.server.time_delay,
             "exp": current_time + TOKEN_EXPIRE_SECONDS + self.server.time_delay,
@@ -843,6 +779,9 @@ class Ilovepdf:
     ) -> requests.Response:
         """Send a request to the iLovePDF API.
 
+        Retries once on transient authentication failures (for example,
+        "Signature verification failed") after refreshing the cached token.
+
         Args:
             method (str): HTTP method (GET, POST, etc.).
             endpoint (str): API endpoint path.
@@ -860,23 +799,46 @@ class Ilovepdf:
             DownloadException: If download operation fails.
             StartException: If start operation fails.
         """
-        # Update request builder with current start server
-        self._request_builder.start_server = self.get_start_server()
+        max_attempts = 2 if endpoint != "auth" else 1
+        last_auth_error: AuthException | None = None
 
-        url = self._request_builder.build_url(endpoint, start)
-        timeout = self._request_builder.build_timeout(endpoint)
-        headers = self._request_builder.build_headers(endpoint)
-        params = self._request_builder.prepare_params(params, headers, endpoint)
+        for attempt in range(max_attempts):
+            # Update request builder with current start server
+            self._request_builder.start_server = self.get_start_server()
 
-        _logger.debug(
-            "\nREQUEST:\n  method: %s\n  url: %s\n  params:\n%s",
-            method.upper(),
-            url,
-            pprint.pformat(params, indent=4),
-        )
+            url = self._request_builder.build_url(endpoint, start)
+            timeout = self._request_builder.build_timeout(endpoint)
+            headers = self._request_builder.build_headers(endpoint)
+            prepared_params = self._request_builder.prepare_params(
+                params, headers, endpoint
+            )
 
-        response = self._execute_request(method, url, timeout, params)
-        return self._handle_response(response, endpoint)
+            _logger.debug(
+                "\nREQUEST:\n  method: %s\n  url: %s\n  params:\n%s",
+                method.upper(),
+                url,
+                pprint.pformat(prepared_params, indent=4),
+            )
+
+            response = self._execute_request(method, url, timeout, prepared_params)
+
+            try:
+                return self._handle_response(response, endpoint)
+            except AuthException as exc:
+                last_auth_error = exc
+                if attempt < max_attempts - 1 and self._is_retryable_auth_error(exc):
+                    _logger.warning(
+                        "Authentication failed on %s: %s. "
+                        "Clearing token cache and retrying.",
+                        endpoint,
+                        exc,
+                    )
+                    self._clear_token_cache()
+                    continue
+                raise
+
+        # pragma: no cover
+        raise last_auth_error  # type: ignore[misc]
 
     def _execute_request(
         self, method: str, url: str, timeout: int, params: dict[str, Any]
@@ -948,6 +910,36 @@ class Ilovepdf:
         self._error_router.route(endpoint, response_body, response_code)
 
         return response
+
+    def _clear_token_cache(self) -> None:
+        """Clear the cached authentication token.
+
+        Forces the next request to obtain a fresh token from the API or
+        generate a new local JWT.
+        """
+        self.auth.token_cache = None
+        self.auth.token = None
+
+    def _is_retryable_auth_error(self, exc: AuthException) -> bool:
+        """Check whether an authentication error is worth retrying.
+
+        Only transient 401 errors (such as signature verification failures)
+        are retried, since they can be caused by a stale or locally generated
+        token that the server rejected.
+
+        Args:
+            exc (AuthException): The authentication exception to inspect.
+
+        Returns:
+            bool: True if the request should be retried with a fresh token.
+        """
+        if len(exc.args) < 3:
+            return False
+        _, body, status = exc.args[0], exc.args[1], exc.args[2]
+        if status != HTTP_UNAUTHORIZED:
+            return False
+        message = str(body.get("message", "")).lower() if isinstance(body, dict) else ""
+        return "signature" in message or "verification" in message
 
     def get_status(self, server: str, task_id: str) -> dict[str, Any]:
         """Get the status of a task.
