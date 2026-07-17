@@ -13,7 +13,6 @@ import time
 from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import datetime, timezone
-from importlib.metadata import version as pkg_version
 from typing import Any
 
 import jwt
@@ -31,6 +30,8 @@ from ilovepdf.exceptions import (
     UploadException,
 )
 
+from . import __version__ as _package_version
+
 load_dotenv(find_dotenv())
 
 # Constants
@@ -43,12 +44,6 @@ API_VERSION = "v1"
 START_SERVER_URL = os.getenv("START_SERVER_URL", "https://api.ilovepdf.com")
 API_HOST = os.getenv("API_HOST", "api.ilovepdf.com")
 
-PACKAGE_NAME = "ilovepdf"
-
-try:
-    _package_version = pkg_version(PACKAGE_NAME)
-except Exception:
-    _package_version = "0.0.0"
 
 LIBRARY_VERSION = f"python.{_package_version}"
 

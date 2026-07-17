@@ -1,7 +1,7 @@
 [project]
 name = "ilovepdf"
 description = "iLovePDF Python API"
-version = "1.0.0"
+dynamic = ["version"]
 authors = [{ name = "ilovepdf", email = "developer@ilovepdf.com" }]
 license = "MIT"
 readme = "README.md"
@@ -24,6 +24,9 @@ classifiers = [
 [project.urls]
 Documentation = "https://developer.ilovepdf.com/docs"
 Homepage = "https://ilovepdf.com/"
+
+[tool.setuptools.dynamic]
+version = {attr = "ilovepdf.__version__"}
 
 [tool.setuptools.packages.find]
 where = ["."]

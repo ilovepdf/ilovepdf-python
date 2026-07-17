@@ -131,19 +131,39 @@ For full Docker instructions, see [`.docker/README.md`](.docker/README.md).
 
 ## Versioning
 
-- The version is defined only in `pyproject.toml` → `[project].version`.
+The version is defined as a **single source of truth** in
+`ilovepdf/__init__.py`:
 
-Example: to bump from `1.0.1` to `1.0.2`, change in `pyproject.toml`:
+```python
+__version__ = "1.0.0"
+```
 
-- `version = "1.0.1"` → `version = "1.0.2"`
+`pyproject.toml` declares the version as dynamic and reads it from there:
 
-For a new release, just update the version in `pyproject.toml`.
+```toml
+[project]
+dynamic = ["version"]
+
+[tool.setuptools.dynamic]
+version = {attr = "ilovepdf.__version__"}
+```
+
+At runtime, `ilovepdf/ilovepdf_api.py` imports `__version__` directly from
+`ilovepdf/__init__.py` (instead of reading installed package metadata), so the
+reported `LIBRARY_VERSION` stays in sync with the repo even in editable installs
+or after `git pull` without reinstalling.
+
+Example: to bump from `1.0.1` to `1.0.2`, change in `ilovepdf/__init__.py`:
+
+- `__version__ = "1.0.1"` → `__version__ = "1.0.2"`
+
+Do not duplicate the version in any other file.
 
 ## Publishing to PyPI
 
 To publish a new version to PyPI:
 
-1. Update the version in `pyproject.toml`.
+1. Update the version in `ilovepdf/__init__.py` (`__version__`).
 2. Build the distributions:
 
 ```bash

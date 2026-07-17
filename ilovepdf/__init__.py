@@ -1,5 +1,7 @@
 """ilovepdf package initialization."""
 
+__version__ = "1.0.0"
+
 from . import exceptions
 from .compress_task import CompressTask
 from .editpdf_task import EditPdfTask
@@ -25,6 +27,7 @@ from .validate_pdfa_task import ValidatePdfATask
 from .watermark_task import WatermarkTask
 
 __all__ = [
+    "__version__",
     "exceptions",
     "CompressTask",
     "ExtractTask",
