@@ -11,7 +11,6 @@ from ilovepdf.exceptions import InvalidChoiceError
 from ilovepdf.exceptions.payload_field_errors import MissingPayloadFieldError
 from ilovepdf.translate_task import (
     LANGUAGE_CODE_OPTIONS,
-    OUTPUT_FORMAT_OPTIONS,
 )
 
 from .base_test import AbstractUnitTaskTest
@@ -21,8 +20,8 @@ class TestTranslateTask(AbstractUnitTaskTest):
     """
     Unit tests for TranslateTask.
 
-    Covers initialization, valid and invalid language_input, language_output,
-    and output_format settings, and parameter validation.
+    Covers initialization, valid and invalid language_input, language_output
+    settings, and parameter validation.
     """
 
     _task_class = TranslateTask
@@ -33,11 +32,9 @@ class TestTranslateTask(AbstractUnitTaskTest):
         assert my_task._DEFAULT_PAYLOAD == {
             "language_input": None,
             "language_output": None,
-            "output_format": "pdf",
         }
         assert my_task.language_input is None
         assert my_task.language_output is None
-        assert my_task.output_format == "pdf"
 
     def test_setters_assign_values_correctly(self, my_task):
         """Confirm setters update and persist supported values."""
@@ -46,9 +43,6 @@ class TestTranslateTask(AbstractUnitTaskTest):
             assert my_task.language_input == lang
             my_task.language_output = lang
             assert my_task.language_output == lang
-        for fmt in OUTPUT_FORMAT_OPTIONS:
-            my_task.output_format = fmt
-            assert my_task.output_format == fmt
 
     def test_invalid_language_input_raises(self, my_task):
         """Validate unsupported language_input values raise InvalidChoiceError."""
@@ -61,12 +55,6 @@ class TestTranslateTask(AbstractUnitTaskTest):
         with pytest.raises(InvalidChoiceError) as excinfo:
             my_task.language_output = "invalid_lang"
         assert "language_output" in str(excinfo.value)
-
-    def test_invalid_output_format_raises(self, my_task):
-        """Validate unsupported output_format values raise InvalidChoiceError."""
-        with pytest.raises(InvalidChoiceError) as excinfo:
-            my_task.output_format = "md"
-        assert "output_format" in str(excinfo.value)
 
     def test_to_payload_missing_required_fields(self, my_task):
         """Only fields that remain empty are reported as missing."""

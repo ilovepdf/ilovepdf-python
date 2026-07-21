@@ -107,6 +107,7 @@ All live scripts must remain minimal:
 | `pdftopdfa_advanced.py` | Converts multiple PDFs to PDF/A format, downloads result as ZIP.                   |
 | `pdfocr_basic.py`       | Performs OCR on `sample.pdf` with Spanish language using `PdfOcrTask`.              |
 | `extract_basic.py`      | Extracts text from `sample.pdf` using `ExtractTask` (detailed mode).               |
+| `forms_detect_basic.py`   | Detects form fields in `sample.pdf` using `FormsDetectTask`.                     |
 | `pdfmarkdown_basic.py` | Converts `sample.pdf` to Markdown using `PdfMarkdownTask`.                          |
 
 ### Editing

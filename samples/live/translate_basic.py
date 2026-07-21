@@ -10,7 +10,6 @@ my_task = TranslateTask()
 my_task.add_file("tests/integration/files_samples/sample.pdf")
 my_task.language_input = "eng"
 my_task.language_output = "spa"
-my_task.output_format = "pdf"
 my_task.execute()
 my_task.set_output_filename("translate_basic_result.pdf")
 my_task.download("output_live")

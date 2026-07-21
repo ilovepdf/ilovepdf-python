@@ -14,6 +14,7 @@ This folder contains the core Python source code for interacting with the iLoveP
 |----------------------------|------------------------------------------------------------------|
 | `compress_task.py`         | Compress PDF files to reduce file size.                          |
 | `extract_task.py`          | Extract images or text from PDF files.                           |
+| `forms_detect_task.py`      | Detect form fields in PDF documents.                            |
 | `htmltopdf_task.py`        | Convert HTML documents to PDF.                                   |
 | `imagepdf_task.py`         | Convert images to PDF format.                                    |
 | `merge_task.py`            | Merge multiple PDF files into a single PDF.                      |

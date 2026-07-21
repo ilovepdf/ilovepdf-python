@@ -28,6 +28,7 @@ pytest tests/integration
 | test_integration_01_upload_files.py         | Integration tests for uploading files to the API.                                            |
 | test_integration_compress_task.py           | Integration tests for CompressTask, covering full workflow: adding files, setting compression parameters, executing, and downloading results. |
 | test_integration_extract_task.py            | Integration tests for ExtractTask, covering extraction of text or images from PDFs.           |
+| test_integration_forms_detect_task.py        | Integration tests for FormsDetectTask, detecting form fields in PDFs.                     |
 | test_integration_htmltopdf_task.py          | Integration tests for HtmlToPdfTask, converting HTML to PDF and validating options.           |
 | test_integration_imagepdf_task.py           | Integration tests for ImagePdfTask, converting images to PDF and merging.                     |
 | test_integration_merge_task.py              | Integration tests for MergeTask, merging multiple PDF files.                                  |

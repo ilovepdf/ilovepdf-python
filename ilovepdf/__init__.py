@@ -7,6 +7,7 @@ from .compress_task import CompressTask
 from .editpdf_task import EditPdfTask
 from .extract_task import ExtractTask
 from .file import File
+from .forms_detect_task import FormsDetectTask
 from .htmltopdf_task import HtmlToPdfTask
 from .ilovepdf_api import Ilovepdf
 from .imagepdf_task import ImagePdfTask
@@ -35,6 +36,7 @@ __all__ = [
     "exceptions",
     "CompressTask",
     "ExtractTask",
+    "FormsDetectTask",
     "File",
     "Task",
     "Ilovepdf",

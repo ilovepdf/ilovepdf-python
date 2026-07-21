@@ -32,6 +32,7 @@ Unit tests are designed to verify the correctness of individual functions, class
 - `test_task_methods.py` - Task class methods (start, upload_file, download, execute, get_status)
 - `test_compress_task.py` - CompressTask validation and compression level settings
 - `test_extract_task.py` - ExtractTask extraction parameters and detailed mode
+- `test_forms_detect_task.py` - FormsDetectTask initialization and default payload
 - `test_htmltopdf_task.py` - HtmlToPdfTask HTML-to-PDF conversion parameters
 - `test_imagepdf_task.py` - ImagePdfTask image-to-PDF conversion and parameter validation
 - `test_merge_task.py` - MergeTask basic instantiation and payload
@@ -49,7 +50,7 @@ Unit tests are designed to verify the correctness of individual functions, class
 - `test_split_task.py` - SplitTask split modes, parameter validation, and payload
 - `test_smart_split_task.py` - SmartSplitTask prompt validation, required-field enforcement, and default payload
 - `test_summarize_task.py` - SummarizeTask language and output_format validation
-- `test_translate_task.py` - TranslateTask language and output_format validation
+- `test_translate_task.py` - TranslateTask language_input and language_output validation
 - `test_unlock_task.py` - UnlockTask basic instantiation and payload
 - `test_watermark_task.py` - WatermarkTask watermarking features
 - `test_pagenumbers_task.py` - PageNumbersTask page numbering features, validation, and appearance options

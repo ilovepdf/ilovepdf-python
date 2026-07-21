@@ -66,9 +66,6 @@ LANGUAGE_CODE_OPTIONS = {
     "tha",
 }
 
-OutputFormatType = Literal["pdf", "txt"]
-OUTPUT_FORMAT_OPTIONS = {"pdf", "txt"}
-
 
 class TranslateTask(Task):
     """
@@ -95,7 +92,6 @@ class TranslateTask(Task):
     _DEFAULT_PAYLOAD = {
         "language_input": None,
         "language_output": None,
-        "output_format": "pdf",
     }
 
     REQUIRED_FIELDS = ["language_input", "language_output"]
@@ -147,27 +143,3 @@ class TranslateTask(Task):
         """
         ChoiceValidator.validate(value, LANGUAGE_CODE_OPTIONS, "language_output")
         self._set_attr("language_output", value)
-
-    @property
-    def output_format(self) -> OutputFormatType:
-        """
-        Gets the current output format.
-
-        Returns:
-            OutputFormatType: The current value. Default is "pdf".
-        """
-        return self._get_attr("output_format")
-
-    @output_format.setter
-    def output_format(self, value: OutputFormatType):
-        """
-        Sets the output format for the translated document.
-
-        Args:
-            value (OutputFormatType): Must be one of "pdf" or "txt".
-
-        Raises:
-            InvalidChoiceError: If value is not one of the allowed formats.
-        """
-        ChoiceValidator.validate(value, OUTPUT_FORMAT_OPTIONS, "output_format")
-        self._set_attr("output_format", value)
