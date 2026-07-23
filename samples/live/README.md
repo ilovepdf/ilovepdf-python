@@ -167,3 +167,13 @@ All live scripts must remain minimal:
 ---
 
 For standard (non-live) examples, refer to the parent [`samples/`](../README.md) directory. For automated coverage, see the [`tests/`](../../tests/) folder.
+
+---
+
+## Related Documentation
+
+- [Project Overview](../../README.md)
+- [Samples Overview](../README.md)
+- [Core Library](../../ilovepdf/README.md)
+- [Testing](../../tests/README.md)
+- [Docker and Environment Setup](../../.docker/README.md)

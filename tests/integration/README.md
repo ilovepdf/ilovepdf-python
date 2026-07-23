@@ -9,7 +9,7 @@ This folder contains integration tests for the iLovePDF Python library. Integrat
 
 ## Running Integration Tests
 
-1. Ensure you have a valid `.env` file in the `.docker/` directory with the following variables set:
+1. Ensure you have a valid `.env` file in the project root with the following variables set:
    - `ILOVEPDF_PUBLIC_KEY`
    - `ILOVEPDF_SECRET_KEY`
    - `FOLDER_SAMPLE_PATH` (default: `tests/integration/files_samples`)

@@ -78,7 +78,11 @@ ruff format .
 pyright ilovepdf/
 ```
 
-For pre-commit hooks (autom
+For pre-commit hooks (automatically run on every commit), install them with:
+
+```bash
+pre-commit install
+```
 
 ## Adding a New Task
 
