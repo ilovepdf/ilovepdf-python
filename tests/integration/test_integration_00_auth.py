@@ -27,7 +27,7 @@ class TestAuthAPI(BaseTaskIntegrationTest):
 
     def test_get_token_and_reuse(self):
         """
-        Check that a token is obtained and reused in the session using the real API.
+        Check that a token is generated locally and reused in the session.
         """
         instance = self.task
         token1 = instance.get_token()
@@ -38,18 +38,24 @@ class TestAuthAPI(BaseTaskIntegrationTest):
 
     def test_invalid_credentials_raise_auth_exception(self):
         """
-        Check that invalid credentials raise an authentication error from the real API.
+        Check that invalid credentials raise an authentication error on a real
+        API call.
         """
-        invalid_instance = self.task_class(public_key="invalid", secret_key="invalid")
+        # Use a long enough secret key to avoid PyJWT's InsecureKeyLengthWarning
+        # while still being invalid for the real API.
+        invalid_instance = self.task_class(
+            public_key="invalid",
+            secret_key="invalid_secret_key_that_is_long_enough_for_hs256",
+        )
         with pytest.raises(AuthException) as auth_error:
-            invalid_instance.get_token()
+            invalid_instance.send_request("get", "start/compress", start=True)
         exc = auth_error.value
         assert any(
-            s in str(exc.args) for s in ["ServerError", "Auth error", "Invalid"]
+            s in str(exc.args) for s in ["Unauthorized", "Auth error", "Signature"]
         ), "Expected authentication error message not found."
 
     def test_connection_error(self):
-        """Simulate a connection error and check exception handling."""
+        """Simulate a connection error and check token generation still works."""
 
         def fake_request(*args, **kwargs):
             raise Exception("Simulated connection error")
@@ -61,8 +67,7 @@ class TestAuthAPI(BaseTaskIntegrationTest):
             instance = self.task_class(
                 public_key=self.public_key, secret_key=self.secret_key
             )
-            with pytest.raises(Exception) as connection_error:
-                instance.get_token()
-            assert "Simulated connection error" in str(connection_error.value)
+            token = instance.get_token()
+            assert isinstance(token, str)
         finally:
             requests.request = original_request

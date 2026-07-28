@@ -44,7 +44,7 @@ class TestSplitTaskIntegration(BaseTaskIntegrationTest):
             self.task.ranges = "1,2-3"
             self.task.merge_after = False
 
-        self.split_and_download(configure, "split_range.pdf")
+        self.split_and_download(configure, "split_range.zip")
 
     def test_split_by_fixed_range(self):
         """
@@ -54,7 +54,7 @@ class TestSplitTaskIntegration(BaseTaskIntegrationTest):
         def configure():
             self.task.fixed_range = 1  # Split every page into a separate file
 
-        self.split_and_download(configure, "split_fixed.pdf")
+        self.split_and_download(configure, "split_fixed.zip")
 
     def test_remove_pages_and_split(self):
         """

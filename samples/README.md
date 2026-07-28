@@ -54,6 +54,7 @@ Before running any example script:
 - `split_basic.py`: Split a PDF into separate pages.
 - `split_advanced.py`: Advanced splitting with custom ranges or split modes.
 - `split_advanced_merge.py`: Split a PDF and then merge selected pages.
+- `smart_split_basic.py`: AI-powered smart split based on content analysis.
 
 **Conversion**
 - `office_pdf_basic.py`: Convert an Office document (Excel, Word, PowerPoint) to PDF.
@@ -65,10 +66,13 @@ Before running any example script:
 - `validate_pdfa_basic.py`: Validate if a PDF is PDF/A compliant (no conversion).
 - `pdfocr_basic.py`: Perform OCR on a PDF with language configuration.
 - `extract_basic.py`: Extract text from a PDF.
+- `pdfmarkdown_basic.py`: Convert a PDF file to Markdown format.
+
+**AI Features**
+- `summarize_basic.py`: Generate an AI-powered summary of a PDF document.
+- `translate_basic.py`: Translate a PDF document to another language.
 
 **Editing**
-- `editpdf_basic.py`: Basic EditPdfTask example that places a single text element on
-  the first page and downloads the updated PDF.
 - `editpdf_advanced.py`: Advanced EditPdfTask workflow combining text, image, and SVG
   elements with custom styling and stacking order.
 
@@ -89,12 +93,12 @@ Before running any example script:
 - `sign_basic.py`: Basic digital signature workflow.
 - `sign_advanced.py`: Advanced digital signature workflow with multiple receivers/elements.
 
-**Protection**
+**Protection & Repair**
 - `protect_basic.py`: Add password protection to a PDF file.
-
-**Unlocking & Repair**
-- `unlock_basic.py`: Unlock a password-protected PDF.
 - `repair_basic.py`: Repair a corrupted PDF.
+
+**Unlocking**
+- `unlock_basic.py`: Unlock a password-protected PDF.
 
 ---
 

@@ -21,4 +21,4 @@ class TestUploadFilesIntegration(BaseTaskIntegrationTest):
 
         # 2. Execute the task and download the result
         self.execute_task()
-        self.download_result("integration_image_compressed_sample.jpg")
+        self.download_result("integration_upload_sample.pdf")

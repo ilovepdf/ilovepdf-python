@@ -14,10 +14,12 @@ This folder contains the core Python source code for interacting with the iLoveP
 |----------------------------|------------------------------------------------------------------|
 | `compress_task.py`         | Compress PDF files to reduce file size.                          |
 | `extract_task.py`          | Extract images or text from PDF files.                           |
+| `forms_detect_task.py`      | Detect form fields in PDF documents.                            |
 | `htmltopdf_task.py`        | Convert HTML documents to PDF.                                   |
 | `imagepdf_task.py`         | Convert images to PDF format.                                    |
 | `merge_task.py`            | Merge multiple PDF files into a single PDF.                      |
 | `office_pdf_task.py`       | Convert Office documents (Word, Excel, PowerPoint) to PDF.       |
+| `pdfmarkdown_task.py`     | Convert PDF files to Markdown format.                            |
 | `pdfocr_task.py`           | Perform OCR (Optical Character Recognition) on PDF files.        |
 | `pdftojpg_task.py`         | Convert PDF files to JPG images (pages or extract mode).         |
 | `pdftopdfa_task.py`        | Convert PDF files to PDF/A archival format.                      |
@@ -25,6 +27,9 @@ This folder contains the core Python source code for interacting with the iLoveP
 | `repair_task.py`           | Repair corrupted or damaged PDF files.                           |
 | `rotate_task.py`           | Rotate PDF pages by specified angles.                            |
 | `sign_task.py`             | Digitally sign PDF documents.                                    |
+| `smart_split_task.py`      | AI-powered smart PDF splitting based on content analysis.        |
+| `summarize_task.py`        | AI-powered PDF summarization in multiple languages and formats.   |
+| `translate_task.py`         | AI-powered PDF translation to multiple target languages.           |
 | `split_task.py`            | Split PDF files into separate documents.                         |
 | `unlock_task.py`           | Remove password protection from PDF files.                       |
 | `watermark_task.py`        | Add text or image watermarks to PDFs.                            |

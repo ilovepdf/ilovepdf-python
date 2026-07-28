@@ -3,7 +3,7 @@
 This script demonstrates splitting a PDF into multiple ranges.
 Replace credentials and file paths with your own values for a real test.
 
-For API documentation, see: https://developer.ilovepdf.com/docs/api-reference/split
+For API documentation, see: https://www.iloveapi.com/docs/api-reference#split-extra-parameters
 """
 
 from ilovepdf import SplitTask

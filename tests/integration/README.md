@@ -9,7 +9,7 @@ This folder contains integration tests for the iLovePDF Python library. Integrat
 
 ## Running Integration Tests
 
-1. Ensure you have a valid `.env` file in the `.docker/` directory with the following variables set:
+1. Ensure you have a valid `.env` file in the project root with the following variables set:
    - `ILOVEPDF_PUBLIC_KEY`
    - `ILOVEPDF_SECRET_KEY`
    - `FOLDER_SAMPLE_PATH` (default: `tests/integration/files_samples`)
@@ -28,6 +28,7 @@ pytest tests/integration
 | test_integration_01_upload_files.py         | Integration tests for uploading files to the API.                                            |
 | test_integration_compress_task.py           | Integration tests for CompressTask, covering full workflow: adding files, setting compression parameters, executing, and downloading results. |
 | test_integration_extract_task.py            | Integration tests for ExtractTask, covering extraction of text or images from PDFs.           |
+| test_integration_forms_detect_task.py        | Integration tests for FormsDetectTask, detecting form fields in PDFs.                     |
 | test_integration_htmltopdf_task.py          | Integration tests for HtmlToPdfTask, converting HTML to PDF and validating options.           |
 | test_integration_imagepdf_task.py           | Integration tests for ImagePdfTask, converting images to PDF and merging.                     |
 | test_integration_merge_task.py              | Integration tests for MergeTask, merging multiple PDF files.                                  |
@@ -41,10 +42,15 @@ pytest tests/integration
 | test_integration_rotate_task.py             | Integration tests for RotateTask, rotating PDF pages.                                         |
 | test_integration_sign_basic_task.py         | Integration tests for SignTask, digital signature workflows.                                  |
 | test_integration_split_task.py              | Integration tests for SplitTask, splitting PDFs by range, pages, or size.                     |
+| test_integration_smart_split_task.py      | Integration tests for SmartSplitTask, AI-powered PDF splitting.                        |
+| test_integration_summarize_task.py          | Integration tests for SummarizeTask, AI-powered PDF summarization in multiple languages and formats. |
+| test_integration_translate_task.py           | Integration tests for TranslateTask, AI-powered PDF translation to multiple target languages.         |
 | test_integration_unlock_task.py             | Integration tests for UnlockTask, removing password protection from PDFs.                     |
 | test_integration_watermark_task.py          | Integration tests for WatermarkTask, adding text or image watermarks to PDFs.                 |
 | test_integration_pagenumbers_task.py        | Integration tests for PageNumbersTask, adding page numbers to PDFs with customizable appearance and format. |
+| test_integration_pdfmarkdown_task.py        | Integration tests for PdfMarkdownTask, converting PDF files to Markdown format.                                    |
 | test_integration_editpdf_task.py            | Integration tests for EditPdfTask, covering text, image, and SVG elements plus execute/download workflows. |
+| test_integration_summarize_task.py          | Integration tests for SummarizeTask, AI-powered PDF summarization in multiple languages and formats.   |
 
 Update this table as new integration tests are added.
 

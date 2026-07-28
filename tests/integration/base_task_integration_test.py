@@ -253,3 +253,60 @@ class BaseTaskIntegrationTest(Generic[T]):
         assert os.path.getsize(self.downloaded_file) > 0, (
             f"Downloaded file '{self.downloaded_file}' is empty."
         )
+
+        # Validate the actual file content matches the expected type
+        expected_ext = os.path.splitext(output_filename)[1]
+        if expected_ext:
+            self.assert_file_type(expected_ext)
+
+    # Known file signatures (magic bytes)
+    _FILE_SIGNATURES = {
+        b"%PDF": ".pdf",
+        b"PK": ".zip",  # .docx, .xlsx, etc. are ZIP-based
+        b"\xff\xd8\xff": ".jpg",
+        b"\x89PNG": ".png",
+        b"GIF8": ".gif",
+    }
+
+    # Extensions that are plain text (no binary signature)
+    _TEXT_EXTENSIONS = {".txt", ".md"}
+
+    def assert_file_type(self, expected_extension: str) -> None:
+        """
+        Assert the downloaded file matches the expected type via magic bytes.
+
+        Plain text formats (.txt, .md) are treated as equivalent.
+        """
+        if not self.downloaded_file or not os.path.exists(self.downloaded_file):
+            pytest.fail("No downloaded file to validate.")
+
+        # Ensure extension starts with a dot
+        if not expected_extension.startswith("."):
+            expected_extension = f".{expected_extension}"
+
+        # Read the first 8 bytes to detect file signature
+        with open(self.downloaded_file, "rb") as f:
+            header = f.read(8)
+
+        detected_ext = None
+        for signature, ext in self._FILE_SIGNATURES.items():
+            if header.startswith(signature):
+                detected_ext = ext
+                break
+
+        # If no binary signature detected, treat as plain text
+        if detected_ext is None:
+            detected_ext = ".txt"
+
+        # Both expected and detected are plain text — they're equivalent
+        if (
+            expected_extension.lower() in self._TEXT_EXTENSIONS
+            and detected_ext == ".txt"
+        ):
+            return
+
+        assert detected_ext == expected_extension.lower(), (
+            f"File type mismatch: expected '{expected_extension}', "
+            f"but file content is '{detected_ext}'. "
+            f"The API may have returned the wrong format."
+        )

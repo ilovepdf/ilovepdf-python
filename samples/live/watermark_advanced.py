@@ -3,7 +3,7 @@
 This script demonstrates adding a text watermark with custom options.
 Replace credentials and file paths with your own values for a real test.
 
-For API documentation, see: https://developer.ilovepdf.com/docs/api-reference/watermark
+For API documentation, see: https://www.iloveapi.com/docs/api-reference#watermark-extra-parameters
 """
 
 from ilovepdf import WatermarkTask

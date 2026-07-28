@@ -11,7 +11,7 @@ Valid split configuration options:
 
 For all accessors, see split_task.py and the documentation.
 
-https://developer.ilovepdf.com/docs/api-reference/split-pdf
+https://www.iloveapi.com/docs/api-reference#split-extra-parameters
 """
 
 from ilovepdf import SplitTask

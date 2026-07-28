@@ -426,6 +426,7 @@ class Element(AbstractTaskElement):
         else:
             raise RuntimeError("Element has no parent assigned.")
 
+        self.parent.append_file(file)
         return file
 
     def set_image(self, file_path: str, **kwargs: Any) -> File:
@@ -457,6 +458,7 @@ class Element(AbstractTaskElement):
         extension_list = ["svg"]
         file = self._upload_image(file_path, extension_list=extension_list, **kwargs)
 
+        self._set_attr("server_filename", file.server_filename)
         self.svg = file
         return file
 

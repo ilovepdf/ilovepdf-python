@@ -19,6 +19,7 @@ Unit tests are designed to verify the correctness of individual functions, class
 - `test_ilovepdf.py` - Ilovepdf core class and API initialization
 - `test_ilovepdf_auth_manager.py` - Authentication manager and credential handling
 - `test_error_router.py` - ErrorRouter error handling and exception routing
+- `test_library_version.py` - Library version reporting and propagation to request payloads
 
 ### Core Classes
 
@@ -31,6 +32,7 @@ Unit tests are designed to verify the correctness of individual functions, class
 - `test_task_methods.py` - Task class methods (start, upload_file, download, execute, get_status)
 - `test_compress_task.py` - CompressTask validation and compression level settings
 - `test_extract_task.py` - ExtractTask extraction parameters and detailed mode
+- `test_forms_detect_task.py` - FormsDetectTask initialization and default payload
 - `test_htmltopdf_task.py` - HtmlToPdfTask HTML-to-PDF conversion parameters
 - `test_imagepdf_task.py` - ImagePdfTask image-to-PDF conversion and parameter validation
 - `test_merge_task.py` - MergeTask basic instantiation and payload
@@ -46,11 +48,15 @@ Unit tests are designed to verify the correctness of individual functions, class
 - `test_signer_file.py` - SignerFile file and element management for signature tasks
 - `test_sign_signer.py` - Signer signer type, access code, and file association
 - `test_split_task.py` - SplitTask split modes, parameter validation, and payload
+- `test_smart_split_task.py` - SmartSplitTask prompt validation, required-field enforcement, and default payload
+- `test_summarize_task.py` - SummarizeTask language and output_format validation
+- `test_translate_task.py` - TranslateTask language_input and language_output validation
 - `test_unlock_task.py` - UnlockTask basic instantiation and payload
 - `test_watermark_task.py` - WatermarkTask watermarking features
 - `test_pagenumbers_task.py` - PageNumbersTask page numbering features, validation, and appearance options
 - `test_editpdf_element.py` - EditPdfTask element setters, payload validation, and file upload helpers
 - `test_editpdf_task.py` - EditPdfTask end-to-end task configuration and execute/download workflow
+- `test_pdfmarkdown_task.py` - PdfMarkdownTask initialization and default payload
 - `test_pdftojpg_task.py` - PdfToJpgTask PDF to JPG conversion mode validation and payload
 
 ### Validators
@@ -120,3 +126,11 @@ pytest tests/unit -k "compress" -v
 - When adding new tests, update this README to reflect the changes.
 
 ---
+
+## Related Documentation
+
+- [Project Overview](../../README.md)
+- [Testing Overview](../README.md)
+- [Integration Tests](../integration/README.md)
+- [Core Library](../../ilovepdf/README.md)
+- [Samples and Usage](../../samples/README.md)

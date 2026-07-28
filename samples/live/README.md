@@ -92,6 +92,8 @@ All live scripts must remain minimal:
 | `split_basic.py`            | Splits `sample.pdf` by ranges (`2-4,6-8`) and downloads a ZIP with results.    |
 | `split_advanced.py`         | Advanced PDF splitting with custom ranges and options.                          |
 | `split_advanced_merge.py`   | Splits `sample.pdf` by ranges and merges results into a single PDF.            |
+| `smart_split_basic.py`      | AI-powered smart split using `SmartSplitTask` with prompt guidance.             |
+| `summarize_basic.py`       | AI-powered PDF summarization using `SummarizeTask` with language options.       |
 
 ### Conversion
 
@@ -105,6 +107,8 @@ All live scripts must remain minimal:
 | `pdftopdfa_advanced.py` | Converts multiple PDFs to PDF/A format, downloads result as ZIP.                   |
 | `pdfocr_basic.py`       | Performs OCR on `sample.pdf` with Spanish language using `PdfOcrTask`.              |
 | `extract_basic.py`      | Extracts text from `sample.pdf` using `ExtractTask` (detailed mode).               |
+| `forms_detect_basic.py`   | Detects form fields in `sample.pdf` using `FormsDetectTask`.                     |
+| `pdfmarkdown_basic.py` | Converts `sample.pdf` to Markdown using `PdfMarkdownTask`.                          |
 
 ### Editing
 
@@ -158,6 +162,13 @@ All live scripts must remain minimal:
 | `protect_basic.py`      | Adds password protection to `sample.pdf` using `ProtectTask`.                      |
 | `unlock_basic.py`       | Removes password protection from a PDF using `UnlockTask`.                         |
 
+### AI Features
+
+| Script                  | Description                                                                         |
+| ----------------------- | ----------------------------------------------------------------------------------- |
+| `summarize_basic.py`    | AI-powered PDF summarization with language and format options.                      |
+| `translate_basic.py`    | AI-powered PDF translation to another language.                                      |
+
 ### Repair
 
 | Script                  | Description                                                                         |
@@ -167,3 +178,13 @@ All live scripts must remain minimal:
 ---
 
 For standard (non-live) examples, refer to the parent [`samples/`](../README.md) directory. For automated coverage, see the [`tests/`](../../tests/) folder.
+
+---
+
+## Related Documentation
+
+- [Project Overview](../../README.md)
+- [Samples Overview](../README.md)
+- [Core Library](../../ilovepdf/README.md)
+- [Testing](../../tests/README.md)
+- [Docker and Environment Setup](../../.docker/README.md)
